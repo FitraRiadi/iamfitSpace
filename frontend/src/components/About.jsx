@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { Reveal } from '../lib/anim'
-import aboutPortrait from '../assets/about-portrait.jpg'
+import TiltedCard from './TiltedCard'
+import meImg from '../assets/me.png'
 
 const badges = ['[ WEB DEVELOPMENT ]', '[ GAME DEVELOPMENT ]', '[ UI / UX ]', '[ DIGITAL PRODUCTS ]']
 
@@ -52,40 +53,28 @@ export default function About() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:col-span-5 bg-surface-container-lowest border-2 border-primary p-6 shadow-brutal-lime flex flex-col gap-6"
+            className="lg:col-span-5"
           >
-            <div className="flex items-center justify-between border-b-2 border-surface-container-high pb-3">
-              <span className="font-hud-code text-[11px] text-primary-container font-bold">// TECH_STACK_MATRIX</span>
-              <span className="font-hud-code text-[11px] text-on-surface-variant">LOC: JAKARTA // REMOTE</span>
-            </div>
-            <div className="relative w-full h-64 bg-surface-container border-2 border-surface-container-high overflow-hidden group">
-              <img
-                src={aboutPortrait}
-                alt="IamFit portrait"
-                loading="lazy"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            <div className="aspect-[445/561] w-full">
+              <TiltedCard
+                imageSrc={meImg}
+                altText="Pixel portrait of IamFit"
+                captionText="@IAMFIT // OPERATOR"
+                containerHeight="100%"
+                containerWidth="100%"
+                imageHeight="100%"
+                imageWidth="100%"
+                rotateAmplitude={10}
+                scaleOnHover={1.05}
+                showMobileWarning={false}
+                showTooltip={true}
+                displayOverlayContent={true}
+                overlayContent={
+                  <span className="bg-surface-container-lowest border border-primary px-2 py-1 font-hud-code text-[10px] font-bold text-primary-container">
+                    DEV_HANDLE: Fitra Riadi
+                  </span>
+                }
               />
-              <div className="absolute bottom-2 left-2 bg-surface-container-lowest border border-primary px-2 py-1 font-hud-code text-[10px] text-primary-container">
-                DEV_HANDLE: @IAMFIT
-              </div>
-            </div>
-            <div className="flex flex-col gap-3 font-hud-code text-[12px]">
-              <div className="flex justify-between border-b border-surface-container-high pb-1.5 gap-2">
-                <span className="text-on-surface-variant">PRIMARY ENGINES:</span>
-                <span className="text-primary text-right">Godot 4, Next.js 14, Laravel</span>
-              </div>
-              <div className="flex justify-between border-b border-surface-container-high pb-1.5 gap-2">
-                <span className="text-on-surface-variant">LANGUAGES:</span>
-                <span className="text-primary text-right">TypeScript, C#, PHP, GLSL, SQL</span>
-              </div>
-              <div className="flex justify-between border-b border-surface-container-high pb-1.5 gap-2">
-                <span className="text-on-surface-variant">DESIGN SYSTEM:</span>
-                <span className="text-primary text-right">Dark Neobrutalism / Monospace HUD</span>
-              </div>
-              <div className="flex justify-between gap-2">
-                <span className="text-on-surface-variant">PHILOSOPHY:</span>
-                <span className="text-primary-container font-bold text-right">SHIP WORKING SOFTWARE</span>
-              </div>
             </div>
           </motion.div>
         </div>
