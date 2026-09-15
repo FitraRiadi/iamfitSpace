@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Jersey+15&family=JetBrains+Mono:wght@400;500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #131313;
+  color: #e5e2e1;
+  overscroll-behavior: none;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+.font-jersey { font-family: 'Jersey 15', monospace, sans-serif; }
+.shadow-brutal-lime { box-shadow: 4px 4px 0px #c0f500; }
+.shadow-brutal-white { box-shadow: 4px 4px 0px #ffffff; }
+.shadow-brutal-white-lg { box-shadow: 6px 6px 0px #ffffff; }
+.shadow-brutal-lime-lg { box-shadow: 6px 6px 0px #c0f500; }
+.shadow-brutal-dark { box-shadow: 4px 4px 0px #000000; }
+.hazard-stripes {
+  background: repeating-linear-gradient(
+    -45deg,
+    #c0f500,
+    #c0f500 12px,
+    #0e0e0e 12px,
+    #0e0e0e 24px
+  );
+}

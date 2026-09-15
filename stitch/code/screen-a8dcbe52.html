@@ -1,0 +1,938 @@
+<!DOCTYPE html><html class="dark" lang="en" style="width: 1280px; height: 7498px; overflow: hidden; position: relative;"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "primary-container": "#c0f500", "tertiary-fixed": "#e3e2e2", "surface": "#131313", "on-error-container": "#ffdad6", "primary-fixed-dim": "#a8d700", "on-tertiary-fixed": "#1a1c1c", "on-secondary-fixed": "#1a1c19", "on-secondary": "#2f312e", "inverse-surface": "#e5e2e1", "secondary-container": "#484a46", "on-tertiary-container": "#646464", "on-primary": "#273500", "on-primary-fixed": "#161f00", "surface-tint": "#a8d700", "secondary-fixed": "#e3e3de", "error-container": "#93000a", "error": "#ffb4ab", "primary-fixed": "#c0f500", "surface-container": "#201f1f", "surface-container-highest": "#353534", "inverse-on-surface": "#313030", "on-surface-variant": "#c4caac", "surface-bright": "#3a3939", "on-error": "#690005", "inverse-primary": "#4f6600", "on-primary-fixed-variant": "#3b4d00", "surface-container-high": "#2a2a2a", "surface-dim": "#131313", "secondary-fixed-dim": "#c6c7c2", "outline": "#8e9479", "tertiary-fixed-dim": "#c7c6c6", "surface-variant": "#353534", "secondary": "#c6c7c2", "on-primary-container": "#546d00", "on-background": "#e5e2e1", "primary": "#ffffff", "on-secondary-container": "#b8b9b4", "tertiary-container": "#e3e2e2", "tertiary": "#ffffff", "surface-container-lowest": "#0e0e0e", "on-secondary-fixed-variant": "#454744", "on-tertiary-fixed-variant": "#464747", "on-tertiary": "#2f3131", "on-surface": "#e5e2e1", "outline-variant": "#434933", "surface-container-low": "#1c1b1b", "background": "#131313" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "gutter": "1.5rem", "margin-desktop": "3rem", "space-xs": "0.25rem", "space-xl": "2.5rem", "gutter-lg": "2rem", "margin-mobile": "1rem", "space-lg": "1.5rem", "space-sm": "0.5rem", "margin": "2rem", "gutter-sm": "1rem", "space-md": "1rem" }, "fontFamily": { "headline-lg": ["Space Grotesk"], "hud-metric": ["JetBrains Mono"], "hud-code": ["JetBrains Mono"], "body-sm": ["Plus Jakarta Sans"], "headline-md": ["Space Grotesk"], "headline-sm": ["Space Grotesk"], "display-hero-mobile": ["Space Grotesk"], "headline-xl": ["Space Grotesk"], "hud-label": ["JetBrains Mono"], "body-lg": ["Plus Jakarta Sans"], "headline-xl-mobile": ["Space Grotesk"], "body-md": ["Plus Jakarta Sans"], "display-hero": ["Space Grotesk"] }, "fontSize": { "headline-lg": ["36px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "hud-metric": ["22px", { "lineHeight": "24px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "hud-code": ["13px", { "lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "500" }], "body-sm": ["13px", { "lineHeight": "20px", "fontWeight": "400" }], "headline-md": ["24px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600" }], "display-hero-mobile": ["44px", { "lineHeight": "48px", "letterSpacing": "-0.03em", "fontWeight": "700" }], "headline-xl": ["48px", { "lineHeight": "52px", "letterSpacing": "-0.03em", "fontWeight": "700" }], "hud-label": ["12px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700" }], "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }], "headline-xl-mobile": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-md": ["15px", { "lineHeight": "24px", "fontWeight": "400" }], "display-hero": ["80px", { "lineHeight": "84px", "letterSpacing": "-0.04em", "fontWeight": "700" }] } } } }</script></head><body class="bg-background font-body-md text-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest border-b-2 border-surface-container-high"><div class="h-20 max-w-7xl mx-auto px-margin-mobile lg:px-margin-desktop flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md shrink-0"><img alt="IamFit Space Brand Mark" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1WAPfH_f2qsnZjsxmf8atzTiUtzxVB7cYns-WX6h8O70a73N7wZw5gAjJWAkuIuS7AAlzj903or6e2AUDyh4hk9ufbxuQDfi5WCq7-i6OWVPR1CDLZCB_nMkDa0YVUjvsSkcBTmH7tSD5IL9zc7OfipCBDjLE6B4toY0s-9gSw3Q4v7h2N_2pPUMi16RNZwp_U57pYlAIp0lR4QdMIYie3X6mVY16DOb4yHz7Ty0_jZxxTPXyw_3pLgD64m"><div class="flex flex-col"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm text-primary tracking-tight uppercase">IAMFIT SPACE</span><span class="inline-block w-2 h-2 bg-primary-container animate-pulse"></span></div><span class="font-hud-code text-hud-code text-on-surface-variant uppercase tracking-widest text-[10px]">STATUS: ACTIVE</span></div></div><nav class="hidden md:flex items-center gap-space-lg" data-active-classes="text-primary-container border-b-2 border-primary-container pb-1"><a aria-current="page" class="font-hud-label uppercase transition-colors text-primary-container border-b-2 border-primary-container pb-1" data-path="work" href="#">WORK</a><a class="font-hud-label text-hud-label text-on-surface-variant uppercase hover:text-on-surface transition-colors" data-path="store" href="#">STORE</a><a class="font-hud-label text-hud-label text-on-surface-variant uppercase hover:text-on-surface transition-colors" data-path="about" href="#">ABOUT</a><a class="font-hud-label text-hud-label text-on-surface-variant uppercase hover:text-on-surface transition-colors" data-path="contact" href="#">CONTACT</a></nav><div class="flex items-center gap-space-md shrink-0"><div class="hidden xl:flex items-center gap-space-sm bg-surface-container-low border border-surface-container-high px-space-sm py-space-xs"></div><a class="inline-flex items-center justify-center bg-primary-container text-on-primary-fixed font-hud-label text-hud-label uppercase px-space-md py-space-xs border-2 border-primary-container shadow-[3px_3px_0px_#f5f5f0] hover:shadow-[4px_4px_0px_#f5f5f0] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all" data-path="space-terminal" href="#">ENTER SPACE →</a><div class="flex items-center gap-space-xs"><img alt="Profile" class="w-8 h-8 rounded-full object-cover border border-surface-container-high" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOCoa0U5f4onV5nsELUACdgjzRla8PEkgqdYeKSRAw2NnWgtwBhvJbbMlvt3Ipc4MwOCH2yqPgatoTomrTcykU-cSTFmvXjwVlZLWzCy5mmwrYzpILB3MuNhdyyvM8cDv0fVB8Cty4EjlP_5soeDI3sbAJ5JNno_DK4SP3sx7Tz8i-87wiKfzxhq3JJocJxuQN91ffEu-bIQObxIQoR2d3c9MOX9Jl8g2bDDVUraIMATJYw5pPDOW_Zw"></div></div></div></header><main class="w-full pt-20 bg-background"><div class="flex flex-col w-full text-on-surface select-none">
+<!-- Dynamic Styles for Font Import & Keyframes -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Jersey+15&amp;family=JetBrains+Mono:wght@400;500;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+    .font-jersey { font-family: 'Jersey 15', cursive, monospace; }
+    .shadow-brutal-lime { box-shadow: 4px 4px 0px #c0f500; }
+    .shadow-brutal-white { box-shadow: 4px 4px 0px #ffffff; }
+    .shadow-brutal-white-lg { box-shadow: 6px 6px 0px #ffffff; }
+    .shadow-brutal-lime-lg { box-shadow: 6px 6px 0px #c0f500; }
+    .shadow-brutal-dark { box-shadow: 4px 4px 0px #000000; }
+    .hazard-stripes {
+      background: repeating-linear-gradient(
+        -45deg,
+        #c0f500,
+        #c0f500 12px,
+        #0e0e0e 12px,
+        #0e0e0e 24px
+      );
+    }
+  </style>
+<!-- ========================================================================= -->
+<!-- 1. HERO SECTION -->
+<!-- ========================================================================= -->
+<section class="relative w-full border-b-2 border-surface-container-high bg-surface-dim overflow-hidden">
+<!-- Grid Scaffolding Background Overlay -->
+<div class="absolute inset-0 opacity-15 pointer-events-none" style="background-image: linear-gradient(to right, #353534 1px, transparent 1px), linear-gradient(to bottom, #353534 1px, transparent 1px); background-size: 32px 32px;"></div>
+<!-- Top System Telemetry Bar -->
+<div class="relative w-full border-b border-surface-container-high bg-surface-container-lowest px-margin-mobile lg:px-margin-desktop py-2">
+<div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 font-hud-code text-hud-code text-on-surface-variant">
+
+<div class="flex items-center gap-space-md text-[11px] tracking-wider uppercase">
+
+
+
+
+
+</div>
+</div>
+</div>
+<!-- Main Hero Content -->
+<div class="relative max-w-7xl mx-auto px-margin-mobile lg:px-margin-desktop pt-12 pb-16 lg:py-20 flex flex-col gap-12">
+<!-- Headline & Pitch Cluster -->
+<div class="flex flex-col gap-4 max-w-5xl">
+<div class="flex flex-wrap items-center gap-2 mb-2">
+
+
+
+</div>
+<h1 class="font-jersey text-7xl sm:text-8xl lg:text-9xl tracking-tight text-primary leading-none uppercase">
+          BUILDING DIGITAL <span class="text-primary-container inline-block">WORLDS.</span>
+</h1>
+<p class="font-headline-md text-headline-md text-primary font-semibold tracking-tight">
+          Websites. Games. Apps. Digital Products.
+        </p>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-3xl leading-relaxed">
+          I build websites, games, applications, and digital products under the IamFit ecosystem. A developer's personal digital headquarters engineered with raw speed, mechanical precision, and zero corporate fluff.
+        </p>
+<!-- CTA Action Cluster -->
+<div class="flex flex-wrap items-center gap-4 pt-4">
+<a class="inline-flex items-center justify-center bg-primary-container text-on-primary-fixed font-hud-label text-hud-label uppercase px-7 py-4 border-2 border-primary-container shadow-brutal-white hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal-white-lg active:translate-x-1 active:translate-y-1 active:shadow-none transition-all" href="#work">
+            EXPLORE MY WORK →
+          </a>
+<a class="inline-flex items-center justify-center bg-surface-container-low text-primary font-hud-label text-hud-label uppercase px-7 py-4 border-2 border-primary shadow-brutal-lime hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal-lime-lg active:translate-x-1 active:translate-y-1 active:shadow-none transition-all" href="#store">
+            VISIT IAMFIT STORE →
+          </a>
+<div class="flex items-center gap-2 pl-2">
+<span class="w-3 h-3 border border-primary-container flex items-center justify-center">
+<span class="w-1.5 h-1.5 bg-primary-container"></span>
+</span>
+<span class="font-hud-code text-hud-code text-on-surface-variant">READY TO DEPLOY</span>
+</div>
+</div>
+</div>
+<!-- Interactive Ecosystem HUD Canvas (Tactile Node Schematic) -->
+<div class="w-full bg-surface-container-lowest border-2 border-primary p-4 sm:p-6 lg:p-8 shadow-brutal-lime relative">
+<!-- Corner Technical Brackets -->
+<div class="absolute top-1 left-1 text-[10px] font-hud-code text-primary-container font-bold">+00.00</div>
+<div class="absolute top-1 right-1 text-[10px] font-hud-code text-primary-container font-bold">128.00+</div>
+<div class="absolute bottom-1 left-1 text-[10px] font-hud-code text-on-surface-variant font-bold">SYS_MAP_OK</div>
+<div class="absolute bottom-1 right-1 text-[10px] font-hud-code text-on-surface-variant font-bold">[RADIAL_HUD]</div>
+<div class="flex flex-col md:flex-row items-start md:items-center justify-between border-b-2 border-surface-container-high pb-4 mb-6 gap-2">
+<div class="flex items-center gap-3">
+<span class="font-jersey text-3xl text-primary-container">ECOSYSTEM ARCHITECTURE</span>
+<span class="bg-surface-container-high px-2 py-0.5 font-hud-code text-[11px] text-primary border border-surface-container-highest uppercase">ONE SPACE → MULTIPLE WORLDS</span>
+</div>
+<div class="flex items-center gap-4 font-hud-code text-hud-code text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="w-2 h-2 bg-primary-container inline-block"></span> CORE BUS ACTIVE</span>
+<span class="">TOPOLOGY: DECENTRALIZED</span>
+</div>
+</div>
+<!-- Node Blueprint Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+<!-- Orbit Node A -->
+<div class="md:col-span-3 bg-surface-container-low border-2 border-surface-container-high p-4 flex flex-col gap-2 hover:border-primary-container transition-colors group">
+<div class="flex items-center justify-between font-hud-code text-[11px] text-on-surface-variant">
+<span class="">NODE_A // 01</span>
+<span class="text-primary-container group-hover:underline">STABLE</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-primary uppercase">IAMFIT WEB DEV</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Full-stack web architecture, reactive portals, Next.js, and high-load backend APIs.</p>
+<div class="pt-2 border-t border-surface-container-high font-hud-code text-[10px] text-primary-container uppercase">
+              NEXT.JS // POSTGRES // LARAVEL
+            </div>
+</div>
+<!-- Connector Wire A -> CORE -->
+<div class="hidden md:flex md:col-span-1 items-center justify-center">
+<div class="w-full h-0.5 bg-dashed border-t-2 border-dashed border-surface-container-high relative">
+<span class="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-primary-container"></span>
+</div>
+</div>
+<!-- Central Brutalist Command Block: CORE HQ -->
+<div class="md:col-span-4 bg-surface-container border-2 border-primary-container p-6 text-center shadow-brutal-lime relative my-2 md:my-0">
+<div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary-container text-on-primary font-hud-code text-[10px] px-3 py-0.5 font-bold uppercase tracking-wider">
+              COMMAND NEXUS
+            </div>
+<div class="flex justify-center items-center gap-2 mb-2">
+<span class="w-3 h-3 bg-primary-container animate-ping"></span>
+<span class="font-jersey text-4xl text-primary uppercase tracking-wide">IAMFIT SPACE</span>
+</div>
+<p class="font-hud-code text-hud-code text-primary-container uppercase mb-3">[ CORE HEADQUARTERS ]</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Central routing console dispatching engineering, playable experiences, tools, and digital inventory.</p>
+<div class="mt-4 inline-flex items-center gap-2 bg-surface-container-lowest px-3 py-1 border border-surface-container-high font-hud-code text-[11px] text-primary">
+<span class="text-primary-container">•</span> DISPATCH: ONLINE (100%)
+            </div>
+</div>
+<!-- Connector Wire CORE -> Node B -->
+<div class="hidden md:flex md:col-span-1 items-center justify-center">
+<div class="w-full h-0.5 bg-dashed border-t-2 border-dashed border-surface-container-high relative">
+<span class="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-primary-container"></span>
+</div>
+</div>
+<!-- Orbit Node B -->
+<div class="md:col-span-3 bg-surface-container-low border-2 border-surface-container-high p-4 flex flex-col gap-2 hover:border-primary-container transition-colors group">
+<div class="flex items-center justify-between font-hud-code text-[11px] text-on-surface-variant">
+<span class="">NODE_B // 02</span>
+<span class="text-primary-container group-hover:underline">LIVE ENGINE</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-primary uppercase">IAMFIT GAMEDEV</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Indie games, Godot 4 shaders, combat physics, retro pixel violence, and experimental mechanics.</p>
+<div class="pt-2 border-t border-surface-container-high font-hud-code text-[10px] text-primary-container uppercase">
+              GODOT 4 // C# // GLSL // 2D/3D
+            </div>
+</div>
+<!-- Orbit Node C (Bottom Left) -->
+<div class="md:col-span-6 bg-surface-container-low border-2 border-surface-container-high p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-primary transition-colors">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2 font-hud-code text-[11px] text-on-surface-variant">
+<span class="">NODE_C // 03</span>
+<span class="text-primary-container">[INVENTORY SYSTEM]</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-primary uppercase">IAMFIT STORE</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Direct commercial licensing for boilerplate repos, ready-to-run apps, and UI kits.</p>
+</div>
+<span class="shrink-0 font-hud-code text-[11px] bg-surface-container-high border border-surface-container-highest px-3 py-1.5 text-primary text-center">
+              COMMERCIAL CODE →
+            </span>
+</div>
+<!-- Orbit Node D (Bottom Right) -->
+<div class="md:col-span-6 bg-surface-container-low border-2 border-surface-container-high p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-primary transition-colors">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2 font-hud-code text-[11px] text-on-surface-variant">
+<span class="">NODE_D // 04</span>
+<span class="text-primary-container">[EXPERIMENTAL SANDBOX]</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-primary uppercase">IAMFIT LABS</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">WebGL prototypes, algorithmic animations, generative visual synthesizers, and AI experiments.</p>
+</div>
+<span class="shrink-0 font-hud-code text-[11px] bg-surface-container-high border border-surface-container-highest px-3 py-1.5 text-primary text-center">
+              R&amp;D ARCHIVE →
+            </span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- 2. SECTION 01 — THE SPACE (Ecosystem Branches) -->
+<!-- ========================================================================= -->
+<section class="w-full bg-surface py-20 border-b-2 border-surface-container-high" id="space">
+<div class="max-w-7xl mx-auto px-margin-mobile lg:px-margin-desktop flex flex-col gap-12">
+<!-- Section Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between border-b-2 border-surface-container-high pb-6 gap-4">
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2 font-hud-label text-hud-label text-primary-container tracking-widest">
+<span class="">// 01 — DISPATCH MODULE</span>
+<span class="text-on-surface-variant">:: [STRUCT_UNIFIED]</span>
+</div>
+<h2 class="font-jersey text-6xl sm:text-7xl lg:text-8xl text-primary tracking-tight uppercase leading-none">
+            ONE SPACE. MULTIPLE WORLDS.
+          </h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">
+          IamFit Space is the unified home for everything built, managed, and shipped. No fractured identities. Every line of code, game build, and released product originates here.
+        </p>
+</div>
+<!-- 4 Brutalist Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Card 01: Web Dev -->
+<div class="bg-surface-container-low border-2 border-primary p-6 flex flex-col justify-between shadow-brutal-white hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-lime transition-all">
+<div class="flex flex-col gap-4">
+<div class="flex items-center justify-between border-b border-surface-container-high pb-3 font-hud-code text-hud-code">
+<span class="text-primary-container font-bold">[ BRANCH_01 ]</span>
+<span class="text-on-surface-variant">DEV // WEB</span>
+</div>
+<div class="w-10 h-10 bg-primary-container text-on-primary flex items-center justify-center font-hud-label font-bold text-lg border border-primary-container">
+              &lt;/&gt;
+            </div>
+<h3 class="font-headline-md text-headline-md text-primary uppercase">IAMFIT WEB DEV</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Websites, web applications, client solutions, and high-performance web systems tailored for scale, speed, and clean typography.
+            </p>
+<div class="flex flex-wrap gap-1.5 pt-2">
+<span class="text-[11px] font-hud-code px-2 py-0.5 bg-surface-container border border-surface-container-highest text-on-surface">React</span>
+<span class="text-[11px] font-hud-code px-2 py-0.5 bg-surface-container border border-surface-container-highest text-on-surface">Next.js</span>
+<span class="text-[11px] font-hud-code px-2 py-0.5 bg-surface-container border border-surface-container-highest text-on-surface">Laravel</span>
+<span class="text-[11px] font-hud-code px-2 py-0.5 bg-surface-container border border-surface-container-highest text-on-surface">TailwindCSS</span>
+</div>
+</div>
+<div class="pt-8">
+<a class="inline-flex w-full items-center justify-between bg-surface-container-high text-primary hover:bg-primary-container hover:text-on-primary font-hud-label text-hud-label uppercase px-4 py-3 border-2 border-primary transition-colors" href="#work">
+<span class="">EXPLORE</span>
+<span class="">→</span>
+</a>
+</div>
+</div>
+<!-- Card 02: GameDev -->
+<div class="bg-surface-container-low border-2 border-primary p-6 flex flex-col justify-between shadow-brutal-white hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-lime transition-all">
+<div class="flex flex-col gap-4">
+<div class="flex items-center justify-between border-b border-surface-container-high pb-3 font-hud-code text-hud-code">
+<span class="text-primary-container font-bold">[ BRANCH_02 ]</span>
+<span class="text-on-surface-variant">GAME // ENGINE</span>
+</div>
+<div class="w-10 h-10 bg-primary-container text-on-primary flex items-center justify-center font-hud-label font-bold text-lg border border-primary-container">
+              ♦
+            </div>
+<h3 class="font-headline-md text-headline-md text-primary uppercase">IAMFIT GAMEDEV</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Indie games, prototypes, interactive physics experiments, and retro cybernetic combat worlds crafted with pixel-level tactile feedback.
+            </p>
+<div class="flex flex-wrap gap-1.5 pt-2">
+<span class="text-[11px] font-hud-code px-2 py-0.5 bg-surface-container border border-surface-container-highest text-on-surface">Godot 4</span>
+<span class="text-[11px] font-hud-code px-2 py-0.5 bg-surface-container border border-surface-container-highest text-on-surface">C#</span>
+<span class="text-[11px] font-hud-code px-2 py-0.5 bg-surface-container border border-surface-container-highest text-on-surface">GLSL</span>
+<span class="text-[11px] font-hud-code px-2 py-0.5 bg-surface-container border border-surface-container-highest text-on-surface">Pixel Art</span>
+</div>
+</div>
+<div class="pt-8">
+<a class="inline-flex w-full items-center justify-between bg-surface-container-high text-primary hover:bg-primary-container hover:text-on-primary font-hud-label text-hud-label uppercase px-4 py-3 border-2 border-primary transition-colors" href="#work">
+<span class="">PLAY / EXPLORE</span>
+<span class="">→</span>
+</a>
+</div>
+</div>
+<!-- Card 03: Store -->
+<div class="bg-surface-container-low border-2 border-primary p-6 flex flex-col justify-between shadow-brutal-white hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-lime transition-all">
+<div class="flex flex-col gap-4">
+<div class="flex items-center justify-between border-b border-surface-container-high pb-3 font-hud-code text-hud-code">
+<span class="text-primary-container font-bold">[ BRANCH_03 ]</span>
+<span class="text-on-surface-variant">PROD // SHOP</span>
+</div>
+<div class="w-10 h-10 bg-primary-container text-on-primary flex items-center justify-center font-hud-label font-bold text-lg border border-primary-container">
+              $
+            </div>
+<h3 class="font-headline-md text-headline-md text-primary uppercase">IAMFIT STORE</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Production source code, battle-tested templates, ready-to-deploy web apps, UI kits, and digital developer productivity assets.
+            </p>
+<div class="flex flex-wrap gap-1.5 pt-2">
+<span class="text-[11px] font-hud-code px-2 py-0.5 bg-surface-container border border-surface-container-highest text-on-surface">Commercial License</span>
+<span class="text-[11px] font-hud-code px-2 py-0.5 bg-surface-container border border-surface-container-highest text-on-surface">Instant DL</span>
+</div>
+</div>
+<div class="pt-8">
+<a class="inline-flex w-full items-center justify-between bg-surface-container-high text-primary hover:bg-primary-container hover:text-on-primary font-hud-label text-hud-label uppercase px-4 py-3 border-2 border-primary transition-colors" href="#store">
+<span class="">SHOP</span>
+<span class="">→</span>
+</a>
+</div>
+</div>
+<!-- Card 04: Labs -->
+<div class="bg-surface-container-low border-2 border-primary p-6 flex flex-col justify-between shadow-brutal-white hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-lime transition-all">
+<div class="flex flex-col gap-4">
+<div class="flex items-center justify-between border-b border-surface-container-high pb-3 font-hud-code text-hud-code">
+<span class="text-primary-container font-bold">[ BRANCH_04 ]</span>
+<span class="text-on-surface-variant">EXP // R&amp;D</span>
+</div>
+<div class="w-10 h-10 bg-primary-container text-on-primary flex items-center justify-center font-hud-label font-bold text-lg border border-primary-container">
+              ◊
+            </div>
+<h3 class="font-headline-md text-headline-md text-primary uppercase">IAMFIT LABS</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Unhinged experiments, computer graphics research, algorithmic generation, and bleeding-edge WebGL interactive sandboxes.
+            </p>
+<div class="flex flex-wrap gap-1.5 pt-2">
+<span class="text-[11px] font-hud-code px-2 py-0.5 bg-surface-container border border-surface-container-highest text-on-surface">WebGL</span>
+<span class="text-[11px] font-hud-code px-2 py-0.5 bg-surface-container border border-surface-container-highest text-on-surface">Canvas API</span>
+<span class="text-[11px] font-hud-code px-2 py-0.5 bg-surface-container border border-surface-container-highest text-on-surface">Micro-tools</span>
+</div>
+</div>
+<div class="pt-8">
+<a class="inline-flex w-full items-center justify-between bg-surface-container-high text-primary hover:bg-primary-container hover:text-on-primary font-hud-label text-hud-label uppercase px-4 py-3 border-2 border-primary transition-colors" href="#status">
+<span class="">DISCOVER</span>
+<span class="">→</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- 3. SECTION 02 — SELECTED WORK -->
+<!-- ========================================================================= -->
+<section class="w-full bg-surface-dim py-20 border-b-2 border-surface-container-high" id="work">
+<div class="max-w-7xl mx-auto px-margin-mobile lg:px-margin-desktop flex flex-col gap-12">
+<!-- Section Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between border-b-2 border-surface-container-high pb-6 gap-4">
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2 font-hud-label text-hud-label text-primary-container tracking-widest">
+<span class="">// 02 — PRODUCTION DEPLOYS</span>
+<span class="text-on-surface-variant">:: [VERIFIED_BUILDS]</span>
+</div>
+<h2 class="font-jersey text-6xl sm:text-7xl lg:text-8xl text-primary tracking-tight uppercase leading-none">
+            WHAT I'M BUILDING
+          </h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">
+          Curated production releases and games built from scratch. High mechanical precision, tight feedback loops, and zero bloat.
+        </p>
+</div>
+<!-- Project Cards Stack -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Project 1: OSB -->
+<div class="bg-surface-container-lowest border-2 border-primary flex flex-col shadow-brutal-white hover:border-primary-container hover:shadow-brutal-lime transition-all group">
+<!-- Terminal Header -->
+<div class="flex items-center justify-between bg-surface-container-low border-b-2 border-primary px-4 py-2 font-hud-code text-[11px]">
+<span class="text-primary font-bold">PRJ_01 // WEB ARCHITECTURE</span>
+<span class="text-primary-container font-bold inline-flex items-center gap-1.5">
+<span class="w-2 h-2 bg-primary-container animate-pulse"></span>
+              STATUS: BUILDING
+            </span>
+</div>
+<!-- Project Preview Image -->
+<div class="relative w-full h-56 bg-surface-container overflow-hidden border-b-2 border-primary">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="A dark-themed modern modular school management web application interface on desktop with brutalist tables, high contrast charts in neon lime green, and student digital book curriculum view on an ultra-wide monitor in a dark workstation." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-yH8uz9fBp74CH1Va0XyUs1GegSLuDl9OxZNijaw4lKELHJZhBHbOOe8Bd8z2mJlne3pRcDKkFAT_D5uPqGgWGLPTXqrPSom9h9VbwZM1S0xxaVtASFQYcudBku0b0BRt7pV1fTBUgIs1hMViwFxcjAoXf--h4Oe0ebzmHJU70XmfEU0ztSUyQOy_8eOpXCH6efKlh1CWlcAcWdtJJrGJdfvGK93_MZ84qcfxw3Tiiz3JGfcSbcH-3g">
+<div class="absolute top-2 right-2 bg-surface-container-lowest border border-primary px-2 py-0.5 font-hud-code text-[10px] text-primary">
+              REV: 0.8.4_STABLE
+            </div>
+</div>
+<!-- Content Body -->
+<div class="p-6 flex flex-col justify-between flex-1 gap-6">
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<span class="font-hud-code text-hud-code text-on-surface-variant uppercase">CATEGORY: WEB DEV</span>
+<span class="font-hud-code text-hud-code text-primary">POSTGRESQL</span>
+</div>
+<h3 class="font-headline-lg text-headline-lg text-primary uppercase">OSB — ONLINE SCHOOL BOOK</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                A modular school management system and digital curriculum book designed for extreme query speed and offline-first classroom synchronicity across remote educational centers.
+              </p>
+<div class="flex flex-wrap gap-2 pt-2">
+<span class="font-hud-code text-[11px] bg-surface-container border border-surface-container-high px-2 py-1 text-primary-container">React</span>
+<span class="font-hud-code text-[11px] bg-surface-container border border-surface-container-high px-2 py-1 text-primary-container">Laravel</span>
+<span class="font-hud-code text-[11px] bg-surface-container border border-surface-container-high px-2 py-1 text-primary-container">PostgreSQL</span>
+</div>
+</div>
+<a class="inline-flex items-center justify-center bg-primary-container text-on-primary font-hud-label text-hud-label uppercase py-3 border-2 border-primary-container shadow-brutal-dark hover:bg-primary transition-colors" href="#">
+              VIEW PROJECT BRIEF →
+            </a>
+</div>
+</div>
+<!-- Project 2: Knight Battle -->
+<div class="bg-surface-container-lowest border-2 border-primary flex flex-col shadow-brutal-white hover:border-primary-container hover:shadow-brutal-lime transition-all group">
+<!-- Terminal Header -->
+<div class="flex items-center justify-between bg-surface-container-low border-b-2 border-primary px-4 py-2 font-hud-code text-[11px]">
+<span class="text-primary font-bold">PRJ_02 // INDIE GAME DEV</span>
+<span class="text-error font-bold inline-flex items-center gap-1.5">
+<span class="w-2 h-2 bg-error animate-pulse"></span>
+              IN DEVELOPMENT
+            </span>
+</div>
+<!-- Project Preview Image -->
+<div class="relative w-full h-56 bg-surface-container overflow-hidden border-b-2 border-primary">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="A gritty retro 2D pixel-art combat scene from a side-scrolling platformer featuring a heavy armored knight parrying a monstrous beast, vivid neon acid lime sparks illuminating a gothic cybernetic arena with CRT scanline aesthetics." src="https://lh3.googleusercontent.com/aida-public/AB6AXuApMP23lnjmNa3YGppL-jQ-dacEZFFvx9Q1Im0rdp4ZRPsOnNXqt8xYdRepQLBx3-O4MKFetEFiZ0zGVwmqVd8ifMCCFpxKm3Kl7ojw2pZEmp2eB6Pz6x2zRoT-gt8Re0vFNyFWXLyxE9IsdRaxjdWwzLZVTugjV_oE_FAvc6JWwcBmLMNyaMcZxk-UEb8JQx4jA_TJ3yHWpMgpPSMXeyOKHHFSoWCXlLv81ezxgE1vtzgLByLH3-IaSQ">
+<div class="absolute top-2 right-2 bg-surface-container-lowest border border-primary px-2 py-0.5 font-hud-code text-[10px] text-primary">
+              BUILD: TEST_ALPHA_03
+            </div>
+</div>
+<!-- Content Body -->
+<div class="p-6 flex flex-col justify-between flex-1 gap-6">
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<span class="font-hud-code text-hud-code text-on-surface-variant uppercase">CATEGORY: GAMEDEV</span>
+<span class="font-hud-code text-hud-code text-primary">GODOT 4</span>
+</div>
+<h3 class="font-headline-lg text-headline-lg text-primary uppercase">KNIGHT BATTLE</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                Fast-paced 2D combat platformer featuring reactive parry mechanics, dynamic frame-perfect lighting, and pixel-art retro brutality with custom GLSL lighting passes.
+              </p>
+<div class="flex flex-wrap gap-2 pt-2">
+<span class="font-hud-code text-[11px] bg-surface-container border border-surface-container-high px-2 py-1 text-primary-container">Godot 4</span>
+<span class="font-hud-code text-[11px] bg-surface-container border border-surface-container-high px-2 py-1 text-primary-container">C#</span>
+<span class="font-hud-code text-[11px] bg-surface-container border border-surface-container-high px-2 py-1 text-primary-container">Custom Shaders</span>
+</div>
+</div>
+<a class="inline-flex items-center justify-center bg-surface-container-high text-primary hover:bg-primary-container hover:text-on-primary font-hud-label text-hud-label uppercase py-3 border-2 border-primary transition-colors" href="#">
+              WATCH DEVLOG &amp; PLAY TEST →
+            </a>
+</div>
+</div>
+<!-- Project 3: HyperGrid UI Engine -->
+<div class="bg-surface-container-lowest border-2 border-primary flex flex-col shadow-brutal-white hover:border-primary-container hover:shadow-brutal-lime transition-all group">
+<!-- Terminal Header -->
+<div class="flex items-center justify-between bg-surface-container-low border-b-2 border-primary px-4 py-2 font-hud-code text-[11px]">
+<span class="text-primary font-bold">PRJ_03 // OPEN SOURCE CORE</span>
+<span class="text-primary-container font-bold inline-flex items-center gap-1.5">
+<span class="w-2 h-2 bg-primary-container"></span>
+              SHIPPED V1.2
+            </span>
+</div>
+<!-- Project Preview Image -->
+<div class="relative w-full h-56 bg-surface-container overflow-hidden border-b-2 border-primary">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Technical blueprint render of a dense developer terminal dashboard interface with dark charcoal cards, stark white borders, acid lime monospace metrics, and high-frequency real-time stock ticker charts." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcTVfa_MQSzKwnZdqywanH0Q3KwA-wFegXJ1PaggOxkFBtzxNlCmvuPY86_046YhjtEmqaEaF7OIIvtGOylw-M-uNE3ykdBSRcOs2zQUTJSqUwotzAfCpS6AwQrKvXs013zDs37WcKWeISiffF50xcwLyoVY0OQnYUdEo6Y06dLIcFN0a6Z-Ji9DxTGbM6tevFGf00JIw4tE2Xhukxxeb1fnPJ6UYEtd9k9zmzVi7YqPxlDsdX5AKcgg">
+<div class="absolute top-2 right-2 bg-surface-container-lowest border border-primary px-2 py-0.5 font-hud-code text-[10px] text-primary">
+              NPM: 14.2K / MO
+            </div>
+</div>
+<!-- Content Body -->
+<div class="p-6 flex flex-col justify-between flex-1 gap-6">
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<span class="font-hud-code text-hud-code text-on-surface-variant uppercase">CATEGORY: DIGITAL PRODUCT</span>
+<span class="font-hud-code text-hud-code text-primary">TYPESCRIPT</span>
+</div>
+<h3 class="font-headline-lg text-headline-lg text-primary uppercase">HYPERGRID UI ENGINE</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                High-density brutalist component architecture engineered specifically for data-heavy developer consoles, telemetry dashboards, and algorithmic trading surfaces.
+              </p>
+<div class="flex flex-wrap gap-2 pt-2">
+<span class="font-hud-code text-[11px] bg-surface-container border border-surface-container-high px-2 py-1 text-primary-container">TypeScript</span>
+<span class="font-hud-code text-[11px] bg-surface-container border border-surface-container-high px-2 py-1 text-primary-container">Tailwind</span>
+<span class="font-hud-code text-[11px] bg-surface-container border border-surface-container-high px-2 py-1 text-primary-container">Headless UI</span>
+</div>
+</div>
+<a class="inline-flex items-center justify-center bg-surface-container-high text-primary hover:bg-primary-container hover:text-on-primary font-hud-label text-hud-label uppercase py-3 border-2 border-primary transition-colors" href="#">
+              INSPECT REPO →
+            </a>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- 4. SECTION 03 — IAMFIT STORE -->
+<!-- ========================================================================= -->
+<section class="w-full bg-surface py-20 border-b-2 border-surface-container-high" id="store">
+<div class="max-w-7xl mx-auto px-margin-mobile lg:px-margin-desktop flex flex-col gap-10">
+<!-- Section Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between border-b-2 border-surface-container-high pb-6 gap-4">
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2 font-hud-label text-hud-label text-primary-container tracking-widest">
+<span class="">// 03 — DIGITAL COMMERCE</span>
+<span class="text-on-surface-variant">:: [COMMERCIAL_READY]</span>
+</div>
+<h2 class="font-jersey text-6xl sm:text-7xl lg:text-8xl text-primary tracking-tight uppercase leading-none">
+            I BUILD IT. YOU CAN USE IT.
+          </h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">
+          Digital products created directly from the battle-tested code of things I build. No filler, no toy boilerplate. Pure utility ready for production.
+        </p>
+</div>
+<!-- Category Filter Tabs -->
+<div class="flex flex-wrap gap-2 pt-2 font-hud-code text-hud-code">
+<button class="bg-primary-container text-on-primary font-bold px-4 py-2 border-2 border-primary-container shadow-brutal-dark">
+          [ ALL ]
+        </button>
+<button class="bg-surface-container-low text-on-surface-variant hover:text-primary hover:border-primary px-4 py-2 border-2 border-surface-container-high transition-colors">
+          [ SOURCE CODE ]
+        </button>
+<button class="bg-surface-container-low text-on-surface-variant hover:text-primary hover:border-primary px-4 py-2 border-2 border-surface-container-high transition-colors">
+          [ WEB TEMPLATES ]
+        </button>
+<button class="bg-surface-container-low text-on-surface-variant hover:text-primary hover:border-primary px-4 py-2 border-2 border-surface-container-high transition-colors">
+          [ READY APPS ]
+        </button>
+<button class="bg-surface-container-low text-on-surface-variant hover:text-primary hover:border-primary px-4 py-2 border-2 border-surface-container-high transition-colors">
+          [ UI / UX ASSETS ]
+        </button>
+<button class="bg-surface-container-low text-on-surface-variant hover:text-primary hover:border-primary px-4 py-2 border-2 border-surface-container-high transition-colors">
+          [ GAME ASSETS ]
+        </button>
+<button class="bg-surface-container-low text-on-surface-variant hover:text-primary hover:border-primary px-4 py-2 border-2 border-surface-container-high transition-colors">
+          [ DIGITAL PRODUCTS ]
+        </button>
+</div>
+<!-- Featured Store Products Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 pt-4">
+<!-- Product 1 -->
+<div class="bg-surface-container-lowest border-2 border-primary p-6 flex flex-col justify-between shadow-brutal-white hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-lime transition-all">
+<div class="flex flex-col gap-4">
+<div class="flex items-center justify-between border-b border-surface-container-high pb-3">
+<span class="bg-surface-container-high text-primary-container px-2 py-0.5 font-hud-code text-[10px] font-bold uppercase tracking-wider">SOURCE CODE</span>
+<span class="font-hud-code text-[11px] text-on-surface-variant">INSTANT ZIP</span>
+</div>
+<div class="h-44 bg-surface-container-high border border-surface-container-highest flex items-center justify-center relative overflow-hidden">
+<div class="absolute inset-0 bg-surface-container-low p-4 flex flex-col justify-between">
+<div class="font-hud-code text-xs text-primary-container">// REACT_ADMIN_STARTER</div>
+<div class="space-y-1 font-hud-code text-[10px] text-on-surface-variant">
+<div class="">&gt; pnpm install @iamfit/admin</div>
+<div class="">&gt; ready in 218ms</div>
+<div class="">&gt; auth: jwt + supabase ready</div>
+</div>
+<div class="flex gap-1">
+<div class="w-full h-2 bg-primary-container"></div>
+<div class="w-1/3 h-2 bg-surface-container-highest"></div>
+</div>
+</div>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary uppercase">React Admin Starter</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              High-performance production boilerplate equipped with dashboard layouts, authentication wrappers, dark mode, and customizable charts.
+            </p>
+<div class="font-hud-code text-[11px] text-primary-container">
+              React • Tailwind • Vite
+            </div>
+</div>
+<div class="pt-6 border-t-2 border-surface-container-high mt-4 flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-hud-code text-[10px] text-on-surface-variant uppercase">PRICE</span>
+<span class="font-jersey text-3xl text-primary">Rp 149.000</span>
+</div>
+<a class="inline-flex items-center justify-center bg-primary-container text-on-primary font-hud-label text-hud-label uppercase px-4 py-2.5 border-2 border-primary-container shadow-brutal-dark hover:bg-primary transition-colors" href="#">
+              VIEW PRODUCT →
+            </a>
+</div>
+</div>
+<!-- Product 2 -->
+<div class="bg-surface-container-lowest border-2 border-primary p-6 flex flex-col justify-between shadow-brutal-white hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-lime transition-all">
+<div class="flex flex-col gap-4">
+<div class="flex items-center justify-between border-b border-surface-container-high pb-3">
+<span class="bg-surface-container-high text-primary-container px-2 py-0.5 font-hud-code text-[10px] font-bold uppercase tracking-wider">GAME ASSETS &amp; CODE</span>
+<span class="font-hud-code text-[11px] text-on-surface-variant">GODOT 4.X</span>
+</div>
+<div class="h-44 bg-surface-container-high border border-surface-container-highest flex items-center justify-center relative overflow-hidden">
+<div class="absolute inset-0 bg-surface-container-low p-4 flex flex-col justify-between">
+<div class="font-hud-code text-xs text-primary-container">// RETRO_ROGUE_KIT</div>
+<div class="flex items-center justify-center h-20">
+<div class="grid grid-cols-4 gap-1">
+<span class="w-4 h-4 bg-primary-container"></span>
+<span class="w-4 h-4 bg-surface-container-highest"></span>
+<span class="w-4 h-4 bg-surface-container-highest"></span>
+<span class="w-4 h-4 bg-primary-container"></span>
+<span class="w-4 h-4 bg-surface-container-highest"></span>
+<span class="w-4 h-4 bg-primary-container"></span>
+<span class="w-4 h-4 bg-primary-container"></span>
+<span class="w-4 h-4 bg-surface-container-highest"></span>
+</div>
+</div>
+<div class="font-hud-code text-[10px] text-on-surface-variant text-center">SPRITESHEETS + SFX PACK INCLUDED</div>
+</div>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary uppercase">Retro Rogue Game Kit</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Turnkey procedural dungeon crawling engine with tilemaps, finite state machines, player controller physics, and chiptune sound assets.
+            </p>
+<div class="font-hud-code text-[11px] text-primary-container">
+              Godot 4 • Sprite Sheets • Audio FX
+            </div>
+</div>
+<div class="pt-6 border-t-2 border-surface-container-high mt-4 flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-hud-code text-[10px] text-on-surface-variant uppercase">PRICE</span>
+<span class="font-jersey text-3xl text-primary">Rp 189.000</span>
+</div>
+<a class="inline-flex items-center justify-center bg-primary-container text-on-primary font-hud-label text-hud-label uppercase px-4 py-2.5 border-2 border-primary-container shadow-brutal-dark hover:bg-primary transition-colors" href="#">
+              VIEW PRODUCT →
+            </a>
+</div>
+</div>
+<!-- Product 3 -->
+<div class="bg-surface-container-lowest border-2 border-primary p-6 flex flex-col justify-between shadow-brutal-white hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-lime transition-all">
+<div class="flex flex-col gap-4">
+<div class="flex items-center justify-between border-b border-surface-container-high pb-3">
+<span class="bg-surface-container-high text-primary-container px-2 py-0.5 font-hud-code text-[10px] font-bold uppercase tracking-wider">WEB TEMPLATES</span>
+<span class="font-hud-code text-[11px] text-on-surface-variant">ASTRO 4.0</span>
+</div>
+<div class="h-44 bg-surface-container-high border border-surface-container-highest flex items-center justify-center relative overflow-hidden">
+<div class="absolute inset-0 bg-surface-container-low p-4 flex flex-col justify-between">
+<div class="font-hud-code text-xs text-primary-container">// BRUTAL_PORTFOLIO_ASTRO</div>
+<div class="space-y-1">
+<div class="h-2 w-3/4 bg-primary"></div>
+<div class="h-2 w-1/2 bg-primary-container"></div>
+<div class="h-2 w-2/3 bg-surface-container-highest"></div>
+</div>
+<div class="font-hud-code text-[10px] text-primary-container">LIGHTHOUSE 100/100/100/100</div>
+</div>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary uppercase">Brutalist Dev Portfolio</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Aggressive, dark-mode personal portfolio template engineered with Astro for instant static page hydration and near-zero JS payload.
+            </p>
+<div class="font-hud-code text-[11px] text-primary-container">
+              Astro • Vanilla JS • Tailwind
+            </div>
+</div>
+<div class="pt-6 border-t-2 border-surface-container-high mt-4 flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-hud-code text-[10px] text-on-surface-variant uppercase">PRICE</span>
+<span class="font-jersey text-3xl text-primary">Rp 99.000</span>
+</div>
+<a class="inline-flex items-center justify-center bg-primary-container text-on-primary font-hud-label text-hud-label uppercase px-4 py-2.5 border-2 border-primary-container shadow-brutal-dark hover:bg-primary transition-colors" href="#">
+              VIEW PRODUCT →
+            </a>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- 5. SECTION 04 — CURRENT STATUS (Developer HUD / System Console) -->
+<!-- ========================================================================= -->
+<section class="w-full bg-surface-dim py-20 border-b-2 border-surface-container-high" id="status">
+<div class="max-w-7xl mx-auto px-margin-mobile lg:px-margin-desktop flex flex-col gap-10">
+<!-- Section Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between border-b-2 border-surface-container-high pb-6 gap-4">
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2 font-hud-label text-hud-label text-primary-container tracking-widest">
+<span class="">// 04 — LIVE TELEMETRY</span>
+<span class="text-on-surface-variant">:: [BIOS_KERNEL_STATUS]</span>
+</div>
+<h2 class="font-jersey text-6xl sm:text-7xl lg:text-8xl text-primary tracking-tight uppercase leading-none">
+            CURRENTLY BUILDING
+          </h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">
+          Live snapshot from my active working directories and development pipelines. Real work in progress, updated directly from repo activity.
+        </p>
+</div>
+<!-- Developer Terminal Chassis -->
+<div class="bg-surface-container-lowest border-2 border-primary p-6 lg:p-8 shadow-brutal-lime relative">
+<!-- Terminal Top Bar -->
+<div class="flex flex-wrap items-center justify-between border-b-2 border-surface-container-high pb-4 mb-6 gap-4">
+<div class="flex items-center gap-3">
+<span class="w-3 h-3 bg-error inline-block"></span>
+<span class="w-3 h-3 bg-primary-container inline-block"></span>
+<span class="w-3 h-3 bg-primary inline-block"></span>
+<span class="font-hud-code text-hud-code text-primary font-bold ml-2">IAMFIT_KERNEL_v1.0.4 :: WORKBENCH</span>
+</div>
+<div class="flex items-center gap-6 font-hud-code text-hud-code">
+<span class="text-on-surface-variant">UPTIME: 142h 19m</span>
+<span class="text-primary-container font-bold">ALL SERVICES OPERATIONAL</span>
+</div>
+</div>
+<!-- Terminal Progress Bars -->
+<div class="flex flex-col gap-6">
+<!-- Bar 1 -->
+<div class="flex flex-col gap-2">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between font-hud-code text-hud-code">
+<span class="text-primary font-bold">OSB // WEB DEVELOPMENT</span>
+<span class="text-primary-container">[████████░░] 80% COMPLETE</span>
+</div>
+<div class="w-full h-3 bg-surface-container border border-surface-container-highest flex gap-0.5 p-0.5">
+<div class="h-full bg-primary-container w-[80%]"></div>
+</div>
+<p class="font-hud-code text-[12px] text-on-surface-variant">
+              &gt; Finalizing database migrations &amp; offline-first student sync portal cache layers.
+            </p>
+</div>
+<!-- Bar 2 -->
+<div class="flex flex-col gap-2">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between font-hud-code text-hud-code">
+<span class="text-primary font-bold">KNIGHT BATTLE // GAMEDEV</span>
+<span class="text-primary-container">[██████░░░░] 60% COMPLETE</span>
+</div>
+<div class="w-full h-3 bg-surface-container border border-surface-container-highest flex gap-0.5 p-0.5">
+<div class="h-full bg-primary-container w-[60%]"></div>
+</div>
+<p class="font-hud-code text-[12px] text-on-surface-variant">
+              &gt; Boss AI behavior tree states, parry window hitbox calibration, and gamepad vibration rumble hooks.
+            </p>
+</div>
+<!-- Bar 3 -->
+<div class="flex flex-col gap-2">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between font-hud-code text-hud-code">
+<span class="text-primary font-bold">IAMFIT SPACE // PLATFORM</span>
+<span class="text-primary-container">[████░░░░░░] 40% COMPLETE</span>
+</div>
+<div class="w-full h-3 bg-surface-container border border-surface-container-highest flex gap-0.5 p-0.5">
+<div class="h-full bg-primary-container w-[40%]"></div>
+</div>
+<p class="font-hud-code text-[12px] text-on-surface-variant">
+              &gt; Automated store checkout webhook pipeline &amp; interactive web terminal emulator integration.
+            </p>
+</div>
+<!-- Bar 4 -->
+<div class="flex flex-col gap-2">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between font-hud-code text-hud-code">
+<span class="text-primary font-bold">NEURAL SHADER LAB // LABS</span>
+<span class="text-primary-container">[█████████░] 90% COMPLETE</span>
+</div>
+<div class="w-full h-3 bg-surface-container border border-surface-container-highest flex gap-0.5 p-0.5">
+<div class="h-full bg-primary-container w-[90%]"></div>
+</div>
+<p class="font-hud-code text-[12px] text-on-surface-variant">
+              &gt; Audio-reactive WebGL fragment shader sandbox with audio spectrum FFT texture pass.
+            </p>
+</div>
+</div>
+<!-- Terminal Hardware Metrics Grid -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8 mt-8 border-t-2 border-surface-container-high">
+<div class="bg-surface-container-low border border-surface-container-highest p-3 flex flex-col">
+<span class="font-hud-code text-[10px] text-on-surface-variant uppercase">ACTIVE REPOSITORIES</span>
+<span class="font-hud-metric text-hud-metric text-primary">14 REPOS</span>
+</div>
+<div class="bg-surface-container-low border border-surface-container-highest p-3 flex flex-col">
+<span class="font-hud-code text-[10px] text-on-surface-variant uppercase">LINES SHIPPED (2026)</span>
+<span class="font-hud-metric text-hud-metric text-primary-container">148,200</span>
+</div>
+<div class="bg-surface-container-low border border-surface-container-highest p-3 flex flex-col">
+<span class="font-hud-code text-[10px] text-on-surface-variant uppercase">SYSTEM CAFFEINE</span>
+<span class="font-hud-metric text-hud-metric text-primary">94% FUEL</span>
+</div>
+<div class="bg-surface-container-low border border-surface-container-highest p-3 flex flex-col">
+<span class="font-hud-code text-[10px] text-on-surface-variant uppercase">SERVER HEALTH</span>
+<span class="font-hud-metric text-hud-metric text-primary-container">ALL GREEN</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- 6. SECTION 05 — ABOUT IAMFIT & PERSONAL MANIFESTO -->
+<!-- ========================================================================= -->
+<section class="w-full bg-surface py-20 border-b-2 border-surface-container-high" id="about">
+<div class="max-w-7xl mx-auto px-margin-mobile lg:px-margin-desktop flex flex-col gap-12">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+<!-- Left Side Bio -->
+<div class="lg:col-span-7 flex flex-col gap-6">
+<div class="flex items-center gap-2 font-hud-label text-hud-label text-primary-container tracking-widest">
+<span class="">// 05 — IDENTITY &amp; CODEBASE</span>
+<span class="text-on-surface-variant">:: [INDEPENDENT_OPERATOR]</span>
+</div>
+<h2 class="font-jersey text-6xl sm:text-7xl lg:text-8xl text-primary tracking-tight uppercase leading-none">
+            WHO IS IAMFIT?
+          </h2>
+<p class="font-headline-sm text-headline-sm text-primary font-semibold leading-snug">
+            Not a standard corporate coder, but an independent technologist turning wild ideas into executable software.
+          </p>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+            IamFit is a developer and digital creator building things across web development, game development, and digital products. I operate on the intersection between raw computing power, tactile game feel, and brutalist web design. Every project is built from scratch with an emphasis on performance, ownership, and zero bloatware.
+          </p>
+<!-- Interactive Capability Badges -->
+<div class="flex flex-wrap gap-2 pt-2">
+<span class="font-hud-code text-hud-code px-3 py-1.5 bg-surface-container-high text-primary border-2 border-primary">
+              [ WEB DEVELOPMENT ]
+            </span>
+<span class="font-hud-code text-hud-code px-3 py-1.5 bg-surface-container-high text-primary border-2 border-primary">
+              [ GAME DEVELOPMENT ]
+            </span>
+<span class="font-hud-code text-hud-code px-3 py-1.5 bg-surface-container-high text-primary border-2 border-primary">
+              [ UI / UX ]
+            </span>
+<span class="font-hud-code text-hud-code px-3 py-1.5 bg-surface-container-high text-primary border-2 border-primary">
+              [ DIGITAL PRODUCTS ]
+            </span>
+<span class="font-hud-code text-hud-code px-3 py-1.5 bg-primary-container text-on-primary font-bold border-2 border-primary-container">
+              [ EXPERIMENTATION ]
+            </span>
+</div>
+<div class="pt-4">
+<a class="inline-flex items-center justify-center bg-surface-container-low text-primary font-hud-label text-hud-label uppercase px-6 py-3.5 border-2 border-primary shadow-brutal-white hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal-lime transition-all" href="#contact">
+              MORE ABOUT ME →
+            </a>
+</div>
+</div>
+<!-- Right Side Tactical Profile Card -->
+<div class="lg:col-span-5 bg-surface-container-lowest border-2 border-primary p-6 shadow-brutal-lime flex flex-col gap-6">
+<div class="flex items-center justify-between border-b-2 border-surface-container-high pb-3">
+<span class="font-hud-code text-[11px] text-primary-container font-bold">// TECH_STACK_MATRIX</span>
+<span class="font-hud-code text-[11px] text-on-surface-variant">LOC: JAKARTA // REMOTE</span>
+</div>
+<!-- Stylized Avatar / Hardware Console -->
+<div class="relative w-full h-64 bg-surface-container border-2 border-surface-container-high overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A portrait of a male indie game developer and software engineer working at night surrounded by glowing multi-monitor setup with code editors, game engine interfaces, and green mechanical keyboard in cyberpunk style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuARLKL2hA3At4asR9X96SWxt_RERqOL7McclFAKuSLsv-EzcE3KaEoqFrUuK6ROmQnUqAWIAJNq4YCJj-7xJcGeiJ7ACM4HoSO5ZBbVj01f-yCdOys36B-TCL0Nz5w9njEMxn0WmIVHn67-g7-6c67vcilvOmJXD_rEEtfqxngAzj3Jjj8f6_dgF_YmiRG8JBWe5cWYeiG4uR8XSybQCoMliw94EOkhqzljromebbC-BTVlCkFZWZHuew">
+<div class="absolute bottom-2 left-2 bg-surface-container-lowest border border-primary px-2 py-1 font-hud-code text-[10px] text-primary-container">
+              DEV_HANDLE: @IAMFIT
+            </div>
+</div>
+<div class="flex flex-col gap-3 font-hud-code text-[12px]">
+<div class="flex justify-between border-b border-surface-container-high pb-1.5">
+<span class="text-on-surface-variant">PRIMARY ENGINES:</span>
+<span class="text-primary">Godot 4, Next.js 14, Laravel</span>
+</div>
+<div class="flex justify-between border-b border-surface-container-high pb-1.5">
+<span class="text-on-surface-variant">LANGUAGES:</span>
+<span class="text-primary">TypeScript, C#, PHP, GLSL, SQL</span>
+</div>
+<div class="flex justify-between border-b border-surface-container-high pb-1.5">
+<span class="text-on-surface-variant">DESIGN SYSTEM:</span>
+<span class="text-primary">Dark Neobrutalism / Monospace HUD</span>
+</div>
+<div class="flex justify-between">
+<span class="text-on-surface-variant">PHILOSOPHY:</span>
+<span class="text-primary-container font-bold">SHIP WORKING SOFTWARE</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- 7. SECTION 06 — EXPERIMENTAL MANIFESTO MARQUEE BANNER -->
+<!-- ========================================================================= -->
+<div class="w-full bg-primary-container text-on-primary border-y-4 border-primary py-8 overflow-hidden relative">
+<!-- Hazard Stripes Borders -->
+<div class="absolute top-0 left-0 w-full h-2 hazard-stripes"></div>
+<div class="absolute bottom-0 left-0 w-full h-2 hazard-stripes"></div>
+<div class="max-w-7xl mx-auto px-margin-mobile lg:px-margin-desktop flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+<div class="flex flex-col">
+<span class="font-jersey text-5xl sm:text-7xl lg:text-8xl tracking-tight uppercase leading-none text-on-primary">
+          BUILD. BREAK. LEARN. SHIP.
+        </span>
+<p class="font-hud-code text-hud-code font-bold tracking-wider text-on-primary-container uppercase mt-1">
+          IamFit Space is a place to turn ideas into things that actually exist.
+        </p>
+</div>
+<div class="shrink-0 flex items-center gap-3">
+<span class="w-4 h-4 bg-on-primary animate-bounce"></span>
+<span class="font-jersey text-3xl sm:text-4xl text-on-primary uppercase tracking-widest">NO COMPROMISE</span>
+</div>
+</div>
+</div>
+<!-- ========================================================================= -->
+<!-- 8. SECTION 07 — CONTACT & PROJECT INTAKE -->
+<!-- ========================================================================= -->
+<section class="w-full bg-surface-dim py-20" id="contact">
+<div class="max-w-7xl mx-auto px-margin-mobile lg:px-margin-desktop flex flex-col gap-12">
+<!-- Section Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between border-b-2 border-surface-container-high pb-6 gap-4">
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2 font-hud-label text-hud-label text-primary-container tracking-widest">
+<span class="">// 06 — SECURE INTAKE</span>
+<span class="text-on-surface-variant">:: [TERMINAL_TRANSMISSION]</span>
+</div>
+<h2 class="font-jersey text-6xl sm:text-7xl lg:text-8xl text-primary tracking-tight uppercase leading-none">
+            HAVE SOMETHING TO BUILD?
+          </h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">
+          Let's turn an idea into something real. Available for select web architecture, game development prototypes, and digital product consulting.
+        </p>
+</div>
+<!-- Contact Console Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Interactive Form Console -->
+<div class="lg:col-span-7 bg-surface-container-lowest border-2 border-primary p-6 sm:p-8 shadow-brutal-white">
+<form class="flex flex-col gap-5" onsubmit="event.preventDefault(); alert('Transmission Received: IamFit Core will review your payload shortly.');">
+<div class="flex flex-col gap-2">
+<label class="font-hud-code text-hud-code text-primary uppercase font-bold">
+                OPERATOR_NAME / ORG:
+              </label>
+<input class="bg-surface-container-low border-2 border-surface-container-highest px-4 py-3 font-hud-code text-primary placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container focus:bg-surface-container transition-all" placeholder="e.g. Satoshi / Apex Labs" required="" type="text">
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-hud-code text-hud-code text-primary uppercase font-bold">
+                COMM_CHANNEL (EMAIL / DISCORD):
+              </label>
+<input class="bg-surface-container-low border-2 border-surface-container-highest px-4 py-3 font-hud-code text-primary placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container focus:bg-surface-container transition-all" placeholder="operator@network.com or user#0001" required="" type="text">
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-hud-code text-hud-code text-primary uppercase font-bold">
+                PROJECT CLASSIFICATION:
+              </label>
+<select class="bg-surface-container-low border-2 border-surface-container-highest px-4 py-3 font-hud-code text-primary focus:outline-none focus:border-primary-container focus:bg-surface-container transition-all">
+<option>Full-Stack Web Development</option>
+<option>GameDev / Godot 4 Prototype</option>
+<option>Store Digital Asset Licensing</option>
+<option>Technical Consultation &amp; Review</option>
+<option>Other Wild Experimentation</option>
+</select>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-hud-code text-hud-code text-primary uppercase font-bold">
+                PAYLOAD BRIEF &amp; OBJECTIVE:
+              </label>
+<textarea class="bg-surface-container-low border-2 border-surface-container-highest px-4 py-3 font-hud-code text-primary placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container focus:bg-surface-container transition-all resize-none" placeholder="Describe project requirements, tech stack constraints, and timeline targets..." required="" rows="4"></textarea>
+</div>
+<button class="inline-flex items-center justify-center bg-primary-container text-on-primary-fixed font-hud-label text-hud-label uppercase py-4 border-2 border-primary-container shadow-brutal-white hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal-white-lg active:translate-x-1 active:translate-y-1 active:shadow-none transition-all mt-2 cursor-pointer font-bold" type="submit">
+              TRANSMIT PAYLOAD →
+            </button>
+</form>
+</div>
+<!-- Direct Transmission Channels -->
+<div class="lg:col-span-5 flex flex-col justify-between gap-6">
+<div class="bg-surface-container-low border-2 border-primary p-6 flex flex-col gap-4 shadow-brutal-lime">
+<h4 class="font-headline-sm text-headline-sm text-primary uppercase">DIRECT CHANNELS</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Skip the queue for urgent architecture reviews or game publishing inquiries.
+            </p>
+<div class="flex flex-col gap-3 pt-2">
+<a class="flex items-center justify-between p-3 bg-surface-container border border-surface-container-high hover:border-primary-container transition-colors group" href="mailto:core@iamfit.space">
+<span class="font-hud-code text-hud-code text-on-surface-variant">EMAIL:</span>
+<span class="font-hud-code text-hud-code text-primary group-hover:text-primary-container font-bold">core@iamfit.space</span>
+</a>
+<div class="flex items-center justify-between p-3 bg-surface-container border border-surface-container-high hover:border-primary-container transition-colors group">
+<span class="font-hud-code text-hud-code text-on-surface-variant">DISCORD:</span>
+<span class="font-hud-code text-hud-code text-primary group-hover:text-primary-container font-bold">iamfit.space</span>
+</div>
+<a class="flex items-center justify-between p-3 bg-surface-container border border-surface-container-high hover:border-primary-container transition-colors group" href="https://github.com" rel="noopener noreferrer" target="_blank">
+<span class="font-hud-code text-hud-code text-on-surface-variant">GITHUB:</span>
+<span class="font-hud-code text-hud-code text-primary group-hover:text-primary-container font-bold">@iamfit</span>
+</a>
+</div>
+</div>
+<!-- Terminal Diagnostics Card -->
+<div class="bg-surface-container-lowest border-2 border-surface-container-high p-6 flex flex-col gap-3 font-hud-code text-hud-code">
+<div class="flex items-center justify-between text-primary-container">
+<span class="font-bold">// COMM_RELAY_STATUS</span>
+<span class="">200_OK</span>
+</div>
+<p class="text-body-sm text-on-surface-variant">
+              Average transmission response rate is within 24 hours during production cycles. Direct encrypted payloads are prioritized.
+            </p>
+<div class="pt-2 flex items-center gap-2 text-[11px] text-primary">
+<span class="w-2 h-2 bg-primary-container inline-block"></span>
+              PUBLIC ENCRYPTION KEY: 0x98AF...7C12
+            </div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div></main><footer class="w-full bg-surface-container-lowest border-t-2 border-surface-container-high pt-space-xl pb-space-lg"><div class="max-w-7xl mx-auto px-margin-mobile lg:px-margin-desktop"><div class="grid grid-cols-1 md:grid-cols-12 gap-gutter-lg pb-space-xl border-b border-surface-container-high"><div class="md:col-span-6 flex flex-col justify-between gap-space-md"><div class="flex flex-col gap-space-xs"><span class="font-headline-xl text-headline-xl text-primary tracking-tighter uppercase">IAMFIT SPACE</span><p class="font-hud-label text-hud-label text-primary-container tracking-widest">BUILD. MANAGE. SHOWCASE.</p></div><p class="font-body-sm text-body-sm text-on-surface-variant max-w-md">Dark neobrutalist digital chassis for high-grade creative technology, interactive game environments, and modern web systems engineering.</p></div><div class="md:col-span-3 flex flex-col gap-space-sm"><span class="font-hud-label text-hud-label text-primary uppercase tracking-widest border-b border-surface-container-high pb-space-xs">INDEX MATRIX</span><ul class="flex flex-col gap-space-xs"><li class="flex items-center gap-space-xs"><span class="text-primary-container font-hud-code text-hud-code">//01</span><a class="font-hud-code text-hud-code text-on-surface-variant hover:text-on-surface transition-colors" data-path="work" href="#">Work</a></li><li class="flex items-center gap-space-xs"><span class="text-primary-container font-hud-code text-hud-code">//02</span><a class="font-hud-code text-hud-code text-on-surface-variant hover:text-on-surface transition-colors" data-path="web-development" href="#">Web Development</a></li><li class="flex items-center gap-space-xs"><span class="text-primary-container font-hud-code text-hud-code">//03</span><a class="font-hud-code text-hud-code text-on-surface-variant hover:text-on-surface transition-colors" data-path="gamedev" href="#">GameDev</a></li><li class="flex items-center gap-space-xs"><span class="text-primary-container font-hud-code text-hud-code">//04</span><a class="font-hud-code text-hud-code text-on-surface-variant hover:text-on-surface transition-colors" data-path="store" href="#">Store</a></li></ul></div><div class="md:col-span-3 flex flex-col gap-space-sm"><span class="font-hud-label text-hud-label text-primary uppercase tracking-widest border-b border-surface-container-high pb-space-xs">NETWORK &amp; LABS</span><ul class="flex flex-col gap-space-xs"><li class="flex items-center gap-space-xs"><span class="text-primary-container font-hud-code text-hud-code">//05</span><a class="font-hud-code text-hud-code text-on-surface-variant hover:text-on-surface transition-colors" data-path="labs" href="#">Labs</a></li><li class="flex items-center gap-space-xs"><span class="text-primary-container font-hud-code text-hud-code">//06</span><a class="font-hud-code text-hud-code text-on-surface-variant hover:text-on-surface transition-colors" data-path="about" href="#">About</a></li><li class="flex items-center gap-space-xs"><span class="text-primary-container font-hud-code text-hud-code">//07</span><a class="font-hud-code text-hud-code text-on-surface-variant hover:text-on-surface transition-colors" data-path="contact" href="#">Contact</a></li></ul></div></div><div class="mt-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md pt-space-sm"><div class="flex flex-wrap items-center gap-x-space-md gap-y-space-xs font-hud-code text-hud-code text-on-surface-variant"><span class="text-on-surface">SYSTEM: IAMFIT SPACE</span><span class="text-surface-container-highest">|</span><span class="inline-flex items-center gap-1.5 text-on-surface"><span class="w-2 h-2 rounded-full bg-primary-container"></span>STATUS: ONLINE</span><span class="text-surface-container-highest">|</span><span class="">VERSION: 1.0.4</span><span class="text-surface-container-highest">|</span><span class="text-primary-container">LATENCY: 18MS</span></div><div class="font-hud-code text-hud-code text-on-surface-variant text-center md:text-right">Copyright © 2026 IamFit Space. All rights reserved.</div></div></div></footer>
+
+</body></html>

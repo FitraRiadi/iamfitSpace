@@ -1,0 +1,17 @@
+.char {
+  will-change: transform;
+  display: inline-block;
+}
+
+.scrambled-hero p {
+  margin: 0;
+  padding: 0;
+}
+
+.scrambled-sub p {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  line-height: inherit;
+}
