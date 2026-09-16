@@ -7,7 +7,7 @@ const badges = ['[ WEB DEVELOPMENT ]', '[ GAME DEVELOPMENT ]', '[ UI / UX ]', '[
 
 export default function About() {
   return (
-    <section id="about" className="w-full bg-surface py-20 border-b-2 border-surface-container-high">
+    <section id="about" className="w-full bg-surface py-20 border-b-2 border-surface-container-high overflow-x-clip">
       <div className="max-w-7xl mx-auto px-4 lg:px-12 flex flex-col gap-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           <Reveal className="lg:col-span-7 flex flex-col gap-6">
@@ -49,8 +49,8 @@ export default function About() {
             </div>
           </Reveal>
           <motion.div
-            initial={{ opacity: 0, x: 32 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             className="lg:col-span-5"

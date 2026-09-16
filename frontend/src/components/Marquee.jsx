@@ -14,8 +14,8 @@ export default function Marquee() {
       <div className="absolute bottom-0 left-0 w-full h-2 hazard-stripes" />
       <div className="max-w-7xl mx-auto px-4 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
         <motion.div
-          initial={{ x: -32, opacity: 0 }}
-          whileInView={{ x: 0, opacity: 1 }}
+          initial={{ y: 24, opacity: 0 }}
+          whileInView={{ y: 0, opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, ease: EASE }}
           className="flex flex-col"
@@ -28,8 +28,8 @@ export default function Marquee() {
           </p>
         </motion.div>
         <motion.div
-          initial={{ x: 32, opacity: 0 }}
-          whileInView={{ x: 0, opacity: 1 }}
+          initial={{ y: 24, opacity: 0 }}
+          whileInView={{ y: 0, opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, ease: EASE, delay: 0.15 }}
           className="shrink-0 flex items-center gap-3"

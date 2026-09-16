@@ -41,7 +41,7 @@ const products = [
 export default function Store() {
   const [active, setActive] = useState('ALL')
   return (
-    <section id="store" className="w-full bg-surface py-20 border-b-2 border-surface-container-high">
+    <section id="store" className="w-full bg-surface py-20 border-b-2 border-surface-container-high overflow-x-clip">
       <div className="max-w-7xl mx-auto px-4 lg:px-12 flex flex-col gap-10">
         <SectionHeader
           code="// 03 — DIGITAL COMMERCE"

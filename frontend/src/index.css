@@ -10,6 +10,35 @@ html, body {
   background: #131313;
   color: #e5e2e1;
   overscroll-behavior: none;
+  /* Guard: cegah horizontal overflow bocor ke body (ruang kosong kanan di mobile).
+     Pakai clip (bukan hidden) biar position: sticky navbar tetap jalan. */
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+@supports not (overflow: clip) {
+  html, body {
+    overflow-x: hidden;
+  }
+}
+
+#root {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+@supports not (overflow: clip) {
+  #root {
+    overflow-x: hidden;
+  }
+}
+
+img, svg, video {
+  max-width: 100%;
+}
+
+h1, h2, h3, p {
+  overflow-wrap: break-word;
 }
 
 body {

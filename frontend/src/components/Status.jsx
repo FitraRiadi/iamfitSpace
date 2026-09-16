@@ -18,7 +18,7 @@ const metrics = [
 
 export default function Status() {
   return (
-    <section id="status" className="w-full bg-surface-dim py-20 border-b-2 border-surface-container-high">
+    <section id="status" className="w-full bg-surface-dim py-20 border-b-2 border-surface-container-high overflow-x-clip">
       <div className="max-w-7xl mx-auto px-4 lg:px-12 flex flex-col gap-10">
         <SectionHeader
           code="// 04 — LIVE TELEMETRY"

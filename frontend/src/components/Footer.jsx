@@ -16,7 +16,7 @@ export default function Footer() {
       whileInView={{ opacity: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
-      className="w-full bg-surface-container-lowest border-t-2 border-surface-container-high pt-10 pb-8"
+      className="w-full bg-surface-container-lowest border-t-2 border-surface-container-high pt-10 pb-8 overflow-x-clip"
     >
       <div className="max-w-7xl mx-auto px-4 lg:px-12">
         <Reveal className="grid grid-cols-1 md:grid-cols-12 gap-8 pb-10 border-b border-surface-container-high">

@@ -5,7 +5,7 @@ import { Reveal, staggerParent, staggerChild } from '../lib/anim'
 export default function Contact() {
   const [sent, setSent] = useState(false)
   return (
-    <section id="contact" className="w-full bg-surface-dim py-20">
+    <section id="contact" className="w-full bg-surface-dim py-20 overflow-x-clip">
       <div className="max-w-7xl mx-auto px-4 lg:px-12 flex flex-col gap-12">
         <Reveal className="flex flex-col md:flex-row md:items-end justify-between border-b-2 border-surface-container-high pb-6 gap-4">
           <div className="flex flex-col gap-2">

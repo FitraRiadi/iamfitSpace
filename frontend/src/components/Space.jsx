@@ -47,7 +47,7 @@ const branches = [
 
 export default function Space() {
   return (
-    <section id="space" className="w-full bg-surface py-20 border-b-2 border-surface-container-high">
+    <section id="space" className="w-full bg-surface py-20 border-b-2 border-surface-container-high overflow-x-clip">
       <div className="max-w-7xl mx-auto px-4 lg:px-12 flex flex-col gap-12">
         <SectionHeader
           code="// 01 — DISPATCH MODULE"
