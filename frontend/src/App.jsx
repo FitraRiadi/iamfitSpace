@@ -1,6 +1,7 @@
 import Navbar from './components/Navbar'
 import TargetCursor from './components/TargetCursor'
 import Hero from './components/Hero'
+import TechStack from './components/TechStack'
 import Space from './components/Space'
 import Work from './components/Work'
 import Store from './components/Store'
@@ -25,6 +26,7 @@ function App() {
       <Navbar />
       <main>
         <Hero />
+        <TechStack />
         <Space />
         <Work />
         <Store />

@@ -21,7 +21,7 @@ export default function Status() {
     <section id="status" className="w-full bg-surface-dim py-20 border-b-2 border-surface-container-high overflow-x-clip">
       <div className="max-w-7xl mx-auto px-4 lg:px-12 flex flex-col gap-10">
         <SectionHeader
-          code="// 04 — LIVE TELEMETRY"
+          code="// 05 — LIVE TELEMETRY"
           tag=":: [BIOS_KERNEL_STATUS]"
           title="CURRENTLY BUILDING"
           desc="Live snapshot from my active working directories and development pipelines. Real work in progress, updated directly from repo activity."

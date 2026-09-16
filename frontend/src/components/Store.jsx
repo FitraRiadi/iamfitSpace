@@ -44,7 +44,7 @@ export default function Store() {
     <section id="store" className="w-full bg-surface py-20 border-b-2 border-surface-container-high overflow-x-clip">
       <div className="max-w-7xl mx-auto px-4 lg:px-12 flex flex-col gap-10">
         <SectionHeader
-          code="// 03 — DIGITAL COMMERCE"
+          code="// 04 — DIGITAL COMMERCE"
           tag=":: [COMMERCIAL_READY]"
           title="I BUILD IT. YOU CAN USE IT."
           desc="Digital products created directly from the battle-tested code of things I build. No filler, no toy boilerplate. Pure utility ready for production."

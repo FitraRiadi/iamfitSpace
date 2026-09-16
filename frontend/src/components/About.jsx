@@ -12,7 +12,7 @@ export default function About() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           <Reveal className="lg:col-span-7 flex flex-col gap-6">
             <div className="flex items-center gap-2 font-hud-label text-hud-label text-primary-container tracking-widest">
-              <span>// 05 — IDENTITY & CODEBASE</span>
+              <span>// 06 — IDENTITY & CODEBASE</span>
               <span className="text-on-surface-variant">:: [INDEPENDENT_OPERATOR]</span>
             </div>
             <h2 className="font-jersey text-6xl sm:text-7xl lg:text-8xl text-primary tracking-tight uppercase leading-none">

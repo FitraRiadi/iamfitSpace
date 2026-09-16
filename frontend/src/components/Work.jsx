@@ -55,7 +55,7 @@ export default function Work() {
     <section id="work" className="w-full bg-surface-dim py-20 border-b-2 border-surface-container-high overflow-x-clip">
       <div className="max-w-7xl mx-auto px-4 lg:px-12 flex flex-col gap-12">
         <SectionHeader
-          code="// 02 — PRODUCTION DEPLOYS"
+          code="// 03 — PRODUCTION DEPLOYS"
           tag=":: [VERIFIED_BUILDS]"
           title="WHAT I'M BUILDING"
           desc="Curated production releases and games built from scratch. High mechanical precision, tight feedback loops, and zero bloat."

@@ -10,7 +10,7 @@ export default function Contact() {
         <Reveal className="flex flex-col md:flex-row md:items-end justify-between border-b-2 border-surface-container-high pb-6 gap-4">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2 font-hud-label text-hud-label text-primary-container tracking-widest">
-              <span>// 06 — SECURE INTAKE</span>
+              <span>// 07 — SECURE INTAKE</span>
               <span className="text-on-surface-variant">:: [TERMINAL_TRANSMISSION]</span>
             </div>
             <h2 className="font-jersey text-6xl sm:text-7xl lg:text-8xl text-primary tracking-tight uppercase leading-none">
