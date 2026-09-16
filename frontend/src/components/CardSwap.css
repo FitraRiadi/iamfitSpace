@@ -1,0 +1,34 @@
+/* CardSwap — React Bits base styles, themed to IamFit dark neobrutalism.
+   Differences vs upstream:
+   - Container is centered (compensated by --swap-cx so the fanned stack,
+     which leans +x, stays visually centered). Upstream pins bottom-right.
+   - No scale-down media queries: card size is responsive via props instead,
+     so text stays readable on mobile.
+   - Sharp neobrutalist cards (no radius, lime border + brutal shadow). */
+
+.card-swap-container {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translate(calc(-50% - var(--swap-cx, 60px)), 0);
+  transform-origin: bottom center;
+
+  perspective: 900px;
+  overflow: visible;
+}
+
+.card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 0;
+  border: 2px solid #c0f500;
+  background: #0e0e0e;
+  box-shadow: 6px 6px 0px #c0f500;
+
+  transform-style: preserve-3d;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+}
