@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-motion'
 import { staggerParent, staggerChild } from '../lib/anim'
 import ScrambledText from './ScrambledText'
 import CircularText from './CircularText'
@@ -80,13 +80,7 @@ function HeroTop() {
           </motion.p>
           <motion.div
             variants={staggerChild}
-            className="sm:hidden font-jakarta text-[15px] text-on-surface-variant leading-relaxed"
-          >
-            Websites, games, apps & digital products — engineered with zero fluff.
-          </motion.div>
-          <motion.div
-            variants={staggerChild}
-            className="hidden sm:block font-jakarta text-lg text-on-surface-variant max-w-3xl leading-relaxed"
+            className="font-jakarta text-[14px] sm:text-lg text-on-surface-variant sm:max-w-3xl leading-relaxed"
           >
             <ScrambledText
               className="scrambled-sub"
@@ -324,10 +318,22 @@ export default function Hero() {
     reduced ? {} : { target: pinRef, offset: ['start start', 'end end'] }
   )
 
+  // Hysteresis gate: once the hero is gone it stays gone until the user
+  // scrolls well back up. Kills the flicker when Lenis settling wobbles
+  // progress around a single threshold.
+  const [gone, setGone] = useState(false)
+  useMotionValueEvent(scrollYProgress, 'change', (p) => {
+    if (reduced) return
+    if (!gone && p > 0.75) setGone(true)
+    else if (gone && p < 0.55) setGone(false)
+  })
+
+  // No scroll-driven opacity anywhere on this stage: the hero dives out
+  // solid (zoom + rise). Transparency can't flicker if it doesn't exist.
   const zoom = useTransform(scrollYProgress, [0, 1], [1, 2.4])
-  const fade = useTransform(scrollYProgress, [0, 0.8], [1, 0])
-  const vis = useTransform(scrollYProgress, (p) => (p > 0.85 ? 'hidden' : 'visible'))
-  const pe = useTransform(fade, (o) => (o > 0.15 ? 'auto' : 'none'))
+  const dive = useTransform(scrollYProgress, [0, 0.7], ['0vh', '-60vh'])
+  const vis = gone ? 'hidden' : 'visible'
+  const pe = gone ? 'none' : 'auto'
   const hint = useTransform(scrollYProgress, [0, 0.15], [1, 0])
 
   const gridBg = (
@@ -360,7 +366,7 @@ export default function Hero() {
         <div className="sticky top-0 h-screen overflow-hidden flex items-center">
           {gridBg}
           <motion.div
-            style={{ scale: zoom, opacity: fade, pointerEvents: pe, visibility: vis }}
+            style={{ scale: zoom, y: dive, pointerEvents: pe, visibility: vis }}
             className="absolute inset-0 flex items-start will-change-transform"
           >
           <div className="w-full pt-12 lg:pt-14 pb-6">
