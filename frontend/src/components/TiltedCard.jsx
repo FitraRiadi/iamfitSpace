@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react'
-import { motion, useMotionValue, useSpring } from 'framer-motion'
+import { useRef, useState, useEffect } from 'react'
+import { motion, useMotionValue, useSpring, useTransform, animate } from 'framer-motion'
 import './TiltedCard.css'
 
 const springValues = {
@@ -18,6 +18,8 @@ export default function TiltedCard({
   imageWidth = '300px',
   scaleOnHover = 1.1,
   rotateAmplitude = 14,
+  idleAmplitude = 5,
+  idleDuration = 4,
   showMobileWarning = true,
   showTooltip = true,
   overlayContent = null,
@@ -36,6 +38,36 @@ export default function TiltedCard({
     damping: 30,
     mass: 1,
   })
+
+  // Idle wobble — always on (even without hover), added on top of mouse tilt
+  // so hover control keeps working with zero jumps.
+  const idleX = useMotionValue(0)
+  const idleY = useMotionValue(0)
+  const tiltX = useTransform([rotateX, idleX], ([r, i]) => r + i)
+  const tiltY = useTransform([rotateY, idleY], ([r, i]) => r + i)
+
+  useEffect(() => {
+    if (
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return undefined
+    }
+    const ctrls = [
+      animate(idleX, [0, idleAmplitude, 0, -idleAmplitude, 0], {
+        duration: idleDuration,
+        repeat: Infinity,
+        ease: 'easeInOut',
+      }),
+      animate(idleY, [0, -idleAmplitude, 0, idleAmplitude, 0], {
+        duration: idleDuration * 1.3,
+        delay: idleDuration * 0.2,
+        repeat: Infinity,
+        ease: 'easeInOut',
+      }),
+    ]
+    return () => ctrls.forEach((c) => c.stop())
+  }, [idleX, idleY, idleAmplitude, idleDuration])
 
   const [lastY, setLastY] = useState(0)
 
@@ -94,8 +126,8 @@ export default function TiltedCard({
         style={{
           width: imageWidth,
           height: imageHeight,
-          rotateX,
-          rotateY,
+          rotateX: tiltX,
+          rotateY: tiltY,
           scale,
         }}
       >
