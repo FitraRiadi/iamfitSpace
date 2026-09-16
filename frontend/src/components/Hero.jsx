@@ -125,7 +125,7 @@ export default function Hero() {
             <div className="relative aspect-[719/1024] w-full">
               {/* CircularText — 1 layer di belakang kepala me.png */}
               <div
-                className="absolute -top-4 sm:-top-6 left-1/2 -translate-x-1/2 ml-0 sm:-ml-2 z-0 pointer-events-auto"
+                className="absolute -top-4 sm:-top-6 left-1/2 -translate-x-1/2 ml-0 max-sm:-ml-3 sm:-ml-2 z-0 pointer-events-auto"
                 aria-hidden="true"
               >
                 <CircularText

@@ -45,10 +45,10 @@
 
 @media (max-width: 640px) {
   .hero-circular-badge {
-    width: 190px;
-    height: 190px;
+    width: 220px;
+    height: 220px;
   }
   .hero-circular-badge span {
-    font-size: 20px;
+    font-size: 22px;
   }
 }
