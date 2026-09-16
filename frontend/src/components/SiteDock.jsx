@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import { VscHome, VscLayers, VscCode, VscArchive, VscPulse, VscAccount, VscMail } from 'react-icons/vsc'
 import Dock from './Dock'
+import { EASE } from '../lib/anim'
 
 const scrollTo = (href) => {
   document.querySelector(href)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -16,7 +18,7 @@ const items = [
   { icon: <VscMail size={20} />, label: 'CONTACT', onClick: () => scrollTo('#contact') },
 ]
 
-export default function SiteDock() {
+export default function SiteDock({ intro = true }) {
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
@@ -28,7 +30,12 @@ export default function SiteDock() {
   }, [])
 
   return (
-    <div className="fixed bottom-3 left-1/2 -translate-x-1/2 z-50 max-w-[100vw] px-2">
+    <motion.div
+      className="fixed bottom-3 left-1/2 z-50 max-w-[100vw] px-2"
+      initial={{ opacity: 0, y: 48, x: '-50%' }}
+      animate={intro ? { opacity: 1, y: 0, x: '-50%' } : { opacity: 0, y: 48, x: '-50%' }}
+      transition={{ duration: 0.6, ease: EASE, delay: intro ? 0.5 : 0 }}
+    >
       <Dock
         items={items}
         panelHeight={isMobile ? 50 : 60}
@@ -36,6 +43,6 @@ export default function SiteDock() {
         magnification={isMobile ? 46 : 64}
         distance={isMobile ? 120 : 200}
       />
-    </div>
+    </motion.div>
   )
 }
