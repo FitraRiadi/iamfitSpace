@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { Reveal } from '../lib/anim'
+import { scrollToSection } from '../lib/lenis.js'
 import TiltedCard from './TiltedCard'
 import meImg from '../assets/me.png'
 
@@ -42,6 +43,10 @@ export default function About() {
             <div className="pt-4">
               <a
                 href="#contact"
+                onClick={(e) => {
+                  e.preventDefault()
+                  scrollToSection('#contact')
+                }}
                 className="inline-flex items-center justify-center bg-surface-container-low text-primary font-hud-label text-hud-label uppercase px-6 py-3.5 border-2 border-primary shadow-brutal-white hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal-lime transition-all"
               >
                 MORE ABOUT ME →

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import SectionHeader from './SectionHeader'
 import { staggerParent, staggerChild, EASE } from '../lib/anim'
+import { scrollToSection } from '../lib/lenis.js'
 
 const filters = ['ALL', 'SOURCE CODE', 'WEB TEMPLATES', 'READY APPS', 'UI / UX ASSETS', 'GAME ASSETS', 'DIGITAL PRODUCTS']
 
@@ -115,6 +116,10 @@ export default function Store() {
                   </div>
                   <a
                     href="#contact"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      scrollToSection('#contact')
+                    }}
                     className="inline-flex items-center justify-center bg-primary-container text-on-primary font-hud-label text-hud-label uppercase px-4 py-2.5 border-2 border-primary-container shadow-brutal-dark hover:bg-primary transition-colors"
                   >
                     VIEW PRODUCT →

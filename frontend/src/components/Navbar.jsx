@@ -1,6 +1,13 @@
 import { motion } from 'framer-motion'
 import brandMark from '../assets/brand-mark.svg'
 import { EASE } from '../lib/anim'
+import { scrollToSection } from '../lib/lenis.js'
+
+const go = (e, href) => {
+  e.preventDefault()
+  if (href === '#top') scrollToSection(0)
+  else scrollToSection(href)
+}
 
 const links = [
   { label: 'SPACE', href: '#space' },
@@ -19,8 +26,8 @@ export default function Navbar() {
       transition={{ duration: 0.6, ease: EASE }}
       className="sticky top-0 z-50 w-full bg-surface-container-lowest border-b-2 border-primary"
     >
-      <div className="max-w-7xl mx-auto px-4 lg:px-12 py-3 flex items-center justify-between gap-4">
-        <a href="#top" className="flex items-center gap-3">
+      <div className="max-w-7xl mx-auto px-4 lg:px-12 py-2 flex items-center justify-between gap-4">
+        <a href="#top" onClick={(e) => go(e, '#top')} className="flex items-center gap-3">
           <img src={brandMark} alt="IamFit Space" className="h-9 w-auto" />
         </a>
         <nav className="hidden md:flex items-center gap-1 font-hud-label text-hud-label">
@@ -28,6 +35,7 @@ export default function Navbar() {
             <motion.a
               key={l.label}
               href={l.href}
+              onClick={(e) => go(e, l.href)}
               initial={{ opacity: 0, y: -12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, ease: EASE, delay: 0.15 + i * 0.06 }}
@@ -39,6 +47,7 @@ export default function Navbar() {
         </nav>
         <a
           href="#contact"
+          onClick={(e) => go(e, '#contact')}
           className="inline-flex items-center justify-center bg-primary-container text-on-primary-fixed font-hud-label text-hud-label uppercase px-5 py-2.5 border-2 border-primary-container shadow-brutal-dark hover:bg-primary transition-colors"
         >
           HIRE ME →

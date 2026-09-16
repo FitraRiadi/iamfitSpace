@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Reveal } from '../lib/anim'
 import CardSwap, { Card } from './CardSwap'
+import { scrollToSection } from '../lib/lenis.js'
 import workOsb from '../assets/work-osb.jpg'
 import workKnight from '../assets/work-knight.jpg'
 import workHypergrid from '../assets/work-hypergrid.jpg'
@@ -155,6 +156,10 @@ export default function Work() {
                       </div>
                       <a
                         href="#contact"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          scrollToSection('#contact')
+                        }}
                         className={`mt-auto inline-flex items-center justify-center font-hud-label text-hud-label uppercase py-2.5 border-2 transition-colors ${p.ctaStyle}`}
                       >
                         {p.cta}

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Navbar from './components/Navbar'
 import Preloader from './components/Preloader'
 import TargetCursor from './components/TargetCursor'
@@ -13,9 +13,18 @@ import Marquee from './components/Marquee'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 import SiteDock from './components/SiteDock'
+import { getLenis } from './lib/lenis.js'
 
 function App() {
   const [loading, setLoading] = useState(true)
+
+  // Freeze Lenis while the preloader runs; release on reveal.
+  useEffect(() => {
+    const l = getLenis()
+    if (!l) return
+    if (loading) l.stop()
+    else l.start()
+  }, [loading])
 
   return (
     <div className="dark min-h-screen bg-surface-dim text-on-surface">

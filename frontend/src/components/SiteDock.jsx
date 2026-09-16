@@ -3,13 +3,14 @@ import { motion } from 'framer-motion'
 import { VscHome, VscLayers, VscCode, VscArchive, VscPulse, VscAccount, VscMail } from 'react-icons/vsc'
 import Dock from './Dock'
 import { EASE } from '../lib/anim'
+import { scrollToSection } from '../lib/lenis.js'
 
 const scrollTo = (href) => {
-  document.querySelector(href)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  scrollToSection(href)
 }
 
 const items = [
-  { icon: <VscHome size={20} />, label: 'TOP', onClick: () => scrollTo('#top') },
+  { icon: <VscHome size={20} />, label: 'TOP', onClick: () => scrollToSection(0) },
   { icon: <VscLayers size={20} />, label: 'SPACE', onClick: () => scrollTo('#space') },
   { icon: <VscCode size={20} />, label: 'WORK', onClick: () => scrollTo('#work') },
   { icon: <VscArchive size={20} />, label: 'STORE', onClick: () => scrollTo('#store') },

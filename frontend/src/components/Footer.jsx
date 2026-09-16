@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { Reveal } from '../lib/anim'
+import { scrollToSection } from '../lib/lenis.js'
 
 const index = [
   { n: '//01', label: 'Work', href: '#work' },
@@ -38,7 +39,14 @@ export default function Footer() {
               {index.map((i) => (
                 <li key={i.label} className="flex items-center gap-2">
                   <span className="text-primary-container font-hud-code text-hud-code">{i.n}</span>
-                  <a href={i.href} className="font-hud-code text-hud-code text-on-surface-variant hover:text-on-surface transition-colors">
+                  <a
+                    href={i.href}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      scrollToSection(i.href)
+                    }}
+                    className="font-hud-code text-hud-code text-on-surface-variant hover:text-on-surface transition-colors"
+                  >
                     {i.label}
                   </a>
                 </li>
