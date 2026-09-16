@@ -10,8 +10,8 @@ import gsap from 'gsap'
 // no percentage transforms, no framer-motion in this file.
 
 const STAIR_COUNT = 10
-const STAIR_STAGGER_S = 0.3
-const STAIR_DUR_S = 0.7
+const STAIR_STAGGER_S = 0.18
+const STAIR_DUR_S = 0.5
 const HOLD_MIN_MS = 600
 
 export default function Preloader({ duration = 2500, loadingText = 'Build Everything.', onComplete }) {
