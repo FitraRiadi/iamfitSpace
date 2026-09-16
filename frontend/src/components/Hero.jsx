@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { staggerParent, staggerChild } from '../lib/anim'
 import ScrambledText from './ScrambledText'
+import CircularText from './CircularText'
 import TiltedCard from './TiltedCard'
 import meImg from '../assets/me.png'
 
@@ -121,7 +122,20 @@ export default function Hero() {
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.35 }}
             className="lg:col-span-4 w-full max-w-[300px] mx-auto lg:mx-0 lg:justify-self-end lg:self-start mt-2 lg:mt-2"
           >
-            <div className="aspect-[719/1024] w-full">
+            <div className="relative aspect-[719/1024] w-full">
+              {/* CircularText — 1 layer di belakang kepala me.png */}
+              <div
+                className="absolute -top-4 sm:-top-6 left-1/2 -translate-x-1/2 ml-0 sm:-ml-2 z-0 pointer-events-auto"
+                aria-hidden="true"
+              >
+                <CircularText
+                  text="IAMFIT*SPACE*FITRA*RIADI*"
+                  onHover="speedUp"
+                  spinDuration={14}
+                  className="hero-circular-badge"
+                />
+              </div>
+              <div className="relative z-10 w-full h-full">
               <TiltedCard
                 imageSrc={meImg}
                 altText="Pixel portrait of IamFit"
@@ -135,6 +149,7 @@ export default function Hero() {
                 showMobileWarning={false}
                 showTooltip={true}
               />
+              </div>
             </div>
           </motion.div>
         </div>
