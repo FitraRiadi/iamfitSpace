@@ -4,6 +4,12 @@
 
 const BASE = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000').replace(/\/$/, '')
 
+if (!import.meta.env.VITE_API_URL && import.meta.env.PROD) {
+  console.warn(
+    '[iamfit] VITE_API_URL is not set — API calls fall back to http://127.0.0.1:8000 and will fail in production.'
+  )
+}
+
 const ACCESS_KEY = 'iamfit_access'
 const REFRESH_KEY = 'iamfit_refresh'
 
