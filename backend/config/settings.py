@@ -119,8 +119,17 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database — SQLite when DATABASE_URL is empty, else Postgres (Supabase).
 
-DATABASE_URL = env('DATABASE_URL', '')
+DATABASE_URL = (env('DATABASE_URL', '') or '').strip().strip('"').strip("'")
 if DATABASE_URL:
+    scheme = DATABASE_URL.split('://', 1)[0].lower()
+    if scheme not in ('postgres', 'postgresql', 'pgsql'):
+        from django.core.exceptions import ImproperlyConfigured
+
+        raise ImproperlyConfigured(
+            "DATABASE_URL must be a Postgres connection string "
+            f"(postgresql://user:pass@host:6543/dbname), got scheme '{scheme}'. "
+            'The Supabase API URL (https://...) will NOT work here.'
+        )
     DATABASES = {
         'default': dj_database_url.parse(
             DATABASE_URL,
