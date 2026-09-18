@@ -137,6 +137,12 @@ if DATABASE_URL:
             disable_server_side_cursors=True,  # required on PgBouncer
         )
     }
+    # Fail fast instead of hanging: on Vercel a hanging connect gets the
+    # whole function killed (-> opaque 500). With a timeout it becomes a
+    # clean 503 from /api/health/ that names the problem.
+    DATABASES['default'].setdefault('OPTIONS', {})['connect_timeout'] = int(
+        env('DB_CONNECT_TIMEOUT', '8')
+    )
 else:
     DATABASES = {
         'default': {
