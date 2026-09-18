@@ -170,13 +170,16 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (WhiteNoise — works on Vercel serverless)
-
+# Static files (WhiteNoise — works on Vercel serverless).
+# NOTE: deliberately NOT the manifest storage. Vercel never runs
+# collectstatic, so no manifest exists there — and {% static %} with a
+# manifest storage raises ValueError (-> Django 500) on every
+# browsable-API/admin page. CompressedStaticFilesStorage needs nothing.
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STORAGES = {
     'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
-    'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'},
+    'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage'},
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
