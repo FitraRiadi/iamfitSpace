@@ -1,7 +1,11 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import brandMark from '../assets/brand-mark.svg'
 import { EASE } from '../lib/anim'
 import { scrollToSection } from '../lib/lenis.js'
+import { useAuth } from '../lib/auth'
+import LoginModal from './LoginModal'
 
 const go = (e, href) => {
   e.preventDefault()
@@ -19,7 +23,19 @@ const links = [
 ]
 
 export default function Navbar() {
+  const { user } = useAuth()
+  const navigate = useNavigate()
+  const [loginOpen, setLoginOpen] = useState(false)
+
+  // Secret gate: 1 klik logo = pintu masuk dashboard.
+  const onBrand = (e) => {
+    e.preventDefault()
+    if (user) navigate('/space')
+    else setLoginOpen(true)
+  }
+
   return (
+    <>
     <motion.header
       initial={{ y: -64, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
@@ -27,7 +43,7 @@ export default function Navbar() {
       className="sticky top-0 z-50 w-full bg-surface-container-lowest border-b-2 border-primary"
     >
       <div className="max-w-7xl mx-auto px-4 lg:px-12 py-2 flex items-center justify-between gap-4">
-        <a href="#top" onClick={(e) => go(e, '#top')} className="flex items-center gap-3">
+        <a href="#top" onClick={onBrand} className="flex items-center gap-3" title="IamFit Space">
           <img src={brandMark} alt="IamFit Space" className="h-9 w-auto" />
         </a>
         <nav className="hidden md:flex items-center gap-1 font-hud-label text-hud-label">
@@ -54,5 +70,7 @@ export default function Navbar() {
         </a>
       </div>
     </motion.header>
+    <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
+  </>
   )
 }

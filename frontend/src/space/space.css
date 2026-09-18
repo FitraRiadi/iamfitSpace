@@ -1,0 +1,81 @@
+/* IamFit Space Dashboard — professional thin theme.
+   Deliberately calmer than the landing page: 1px borders, flat surfaces,
+   no brutal shadows. Dark only. Radius stays 0 for brand consistency. */
+
+.space-theme {
+  --sp-bg: #131313;
+  --sp-panel: #1c1b1b;
+  --sp-panel-deep: #0e0e0e;
+  --sp-line: #2a2a2a;
+  --sp-line-soft: #353534;
+  --sp-text: #e5e2e1;
+  --sp-muted: #a8b09a;
+  --sp-lime: #c0f500;
+  --sp-red: #ffb4ab;
+  --sp-amber: #ffd791;
+  --sp-blue: #a8c7fa;
+}
+
+.space-theme input,
+.space-theme select,
+.space-theme textarea {
+  color-scheme: dark;
+}
+
+.sp-scroll::-webkit-scrollbar {
+  display: block;
+  height: 8px;
+  width: 8px;
+}
+.sp-scroll::-webkit-scrollbar-thumb {
+  background: #353534;
+}
+.sp-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sp-table th {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sp-muted);
+  font-weight: 700;
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--sp-line);
+  background: var(--sp-panel-deep);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.sp-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--sp-line);
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.sp-table tbody tr {
+  transition: background-color 0.12s;
+}
+.sp-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.sp-kanban-col[data-over='true'] {
+  border-color: var(--sp-lime);
+  background: rgba(192, 245, 0, 0.04);
+}
+
+.sp-card-drag {
+  opacity: 0.4;
+}
+
+.sp-focus:focus {
+  outline: none;
+  border-color: var(--sp-lime) !important;
+}

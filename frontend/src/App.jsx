@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Preloader from './components/Preloader'
 import TargetCursor from './components/TargetCursor'
@@ -13,7 +14,33 @@ import Marquee from './components/Marquee'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 import SiteDock from './components/SiteDock'
+import SpaceShell, { RequireAuth } from './space/SpaceShell'
+import Overview from './space/Overview'
+import Clients from './space/Clients'
+import Leads from './space/Leads'
+import Projects from './space/Projects'
 import { getLenis } from './lib/lenis.js'
+
+function PublicSite() {
+  return (
+    <>
+      <Navbar />
+      <main>
+        <Hero />
+        <TechStack />
+        <Space />
+        <Work />
+        <Store />
+        <Status />
+        <About />
+        <Marquee />
+        <Contact />
+      </main>
+      <Footer />
+      <SiteDock intro />
+    </>
+  )
+}
 
 function App() {
   const [loading, setLoading] = useState(true)
@@ -41,23 +68,25 @@ function App() {
           framer-motion entrances (Navbar, Hero, whileInView) play fresh
           on reveal instead of running unseen behind the overlay. */}
       {!loading && (
-        <>
-          <Navbar />
-          <main>
-            <Hero />
-            <TechStack />
-            <Space />
-            <Work />
-            <Store />
-            <Status />
-            <About />
-            <Marquee />
-            <Contact />
-          </main>
-          <Footer />
-        </>
+        <Routes>
+          <Route path="/" element={<PublicSite />} />
+          <Route
+            path="/space"
+            element={
+              <RequireAuth>
+                <SpaceShell />
+              </RequireAuth>
+            }
+          >
+            <Route index element={<Overview />} />
+            <Route path="clients" element={<Clients />} />
+            <Route path="leads" element={<Leads />} />
+            <Route path="projects" element={<Projects />} />
+            <Route path="*" element={<Navigate to="/space" replace />} />
+          </Route>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       )}
-      <SiteDock intro={!loading} />
     </div>
   )
 }
