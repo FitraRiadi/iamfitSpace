@@ -13,7 +13,7 @@ class InvoiceAdmin(admin.ModelAdmin):
 
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ('kind', 'category', 'amount', 'occurred_on', 'owner')
+    list_display = ('title', 'kind', 'category', 'amount', 'occurred_on', 'owner')
     list_filter = ('kind', 'category', 'owner')
-    search_fields = ('category', 'notes')
-    autocomplete_fields = ('invoice', 'project')
+    search_fields = ('title', 'category', 'notes')
+    autocomplete_fields = ('lead', 'invoice', 'project')

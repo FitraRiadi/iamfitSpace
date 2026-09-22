@@ -1,5 +1,7 @@
-from rest_framework import viewsets
+from django.db.models import ProtectedError
+from rest_framework import status, viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from config.api import OwnerViewSet
 from .models import Client, Lead, LeadStatusLog
@@ -13,6 +15,23 @@ class ClientViewSet(OwnerViewSet):
     search_fields = ['name', 'company', 'email', 'contact']
     ordering_fields = ['name', 'created_at', 'updated_at']
     ordering = ['-created_at']
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        try:
+            return super().destroy(request, *args, **kwargs)
+        except ProtectedError:
+            n_inv = instance.invoices.count()
+            return Response(
+                {
+                    'detail': (
+                        f'Cannot delete client: {n_inv} invoice(s) linked. '
+                        'Delete or reassign the invoices first.'
+                    ),
+                    'invoices': n_inv,
+                },
+                status=status.HTTP_409_CONFLICT,
+            )
 
 
 class LeadViewSet(OwnerViewSet):

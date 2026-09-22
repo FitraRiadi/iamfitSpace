@@ -1,7 +1,16 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./index.html', './src/**/*.{js,jsx}'],
+  content: ['./index.html', './src/**/*.{js,jsx}', './node_modules/@tremor/**/*.{js,ts,jsx,tsx}'],
   darkMode: 'class',
+  // Tremor charts build palette classes (stroke-lime-500, ...) at runtime,
+  // so they must be safelisted — Tailwind can't see them statically.
+  safelist: [
+    {
+      pattern:
+        /^(bg|text|border|ring|stroke|fill|decoration)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(50|100|200|300|400|500|600|700|800|900|950)$/,
+      variants: ['hover', 'dark'],
+    },
+  ],
   theme: {
     extend: {
       colors: {
@@ -52,6 +61,21 @@ export default {
         'outline-variant': '#434933',
         'surface-container-low': '#1c1b1b',
         background: '#131313',
+        // Tremor chart internals (axis, grid, dots) — same object, no duplicate key.
+        tremor: {
+          border: '#2a2a2a',
+          content: '#a8b09a',
+          'content-emphasis': '#e5e2e1',
+          label: '#a8b09a',
+          background: '#131313',
+        },
+        'dark-tremor': {
+          border: '#2a2a2a',
+          content: '#a8b09a',
+          'content-emphasis': '#e5e2e1',
+          label: '#a8b09a',
+          background: '#131313',
+        },
       },
       fontFamily: {
         jersey: ["'Jersey 15'", 'monospace', 'sans-serif'],

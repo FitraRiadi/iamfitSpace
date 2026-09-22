@@ -6,7 +6,8 @@ import {
   createColumnHelper,
 } from '@tanstack/react-table'
 import { apiGet, apiPost, apiPatch, apiDelete } from '../lib/api'
-import { PageHead, Btn, Modal, Field, inputCls, Empty, ErrorBox, Spinner, Badge, fmtDate } from './ui'
+import { useDeleteQueue, enqueueDelete, flushQueue } from '../lib/deleteQueue'
+import { PageHead, Btn, Modal, Field, inputCls, Empty, ErrorBox, SpinnerCircle, Badge, PendingBar, FailedBox, fmtDate } from './ui'
 
 const columnHelper = createColumnHelper()
 const PAGE_SIZE = 10
@@ -41,26 +42,26 @@ function ClientForm({ initial, onClose, onSaved }) {
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
-      <Field label="Nama *">
-        <input required value={form.name} onChange={set('name')} className={inputCls} placeholder="Nama klien / PIC" />
+      <Field label="Name *">
+        <input required value={form.name} onChange={set('name')} className={inputCls} placeholder="Client / PIC name" />
       </Field>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Field label="Perusahaan / Org">
+        <Field label="Company / Org">
           <input value={form.company} onChange={set('company')} className={inputCls} />
         </Field>
-        <Field label="Kontak">
+        <Field label="Contact">
           <input value={form.contact} onChange={set('contact')} className={inputCls} placeholder="WA / @username" />
         </Field>
       </div>
       <Field label="Email">
         <input type="email" value={form.email} onChange={set('email')} className={inputCls} />
       </Field>
-      <Field label="Catatan">
+      <Field label="Notes">
         <textarea rows={3} value={form.notes} onChange={set('notes')} className={`${inputCls} resize-none`} />
       </Field>
       {error && <ErrorBox message={error} />}
       <Btn type="submit" disabled={busy}>
-        {busy ? 'MENYIMPAN...' : initial?.id ? 'SIMPAN PERUBAHAN' : '+ TAMBAH KLIEN'}
+        {busy ? 'SAVING...' : initial?.id ? 'SAVE CHANGES' : '+ ADD CLIENT'}
       </Btn>
     </form>
   )
@@ -113,26 +114,43 @@ export default function Clients() {
     return () => clearTimeout(t)
   }, [search])
 
-  const del = async () => {
+  // Batched deletes via shared hook (auto-flush on enter/leave/close).
+  const dq = useDeleteQueue('clients', load)
+  const { queued, failed, syncing } = dq
+  const queueDel = () => {
     if (!confirmDel) return
+    dq.queueOne({ id: confirmDel.id, label: confirmDel.name })
+    setConfirmDel(null)
+  }
+
+  // FORCE delete: queue the blocking invoices first, sync them away,
+  // then the client delete (still queued) succeeds on retry.
+  const [forcing, setForcing] = useState(false)
+  const forceDeleteClient = async (item) => {
+    setForcing(true)
     try {
-      await apiDelete(`/api/clients/${confirmDel.id}/`)
-      setConfirmDel(null)
-      load()
+      const inv = await apiGet('/api/invoices/', { client: item.id, page_size: 100 })
+      for (const v of inv.results || []) {
+        enqueueDelete('invoices', { id: v.id, label: v.number })
+      }
+      await flushQueue('invoices', (id, o) => apiDelete(`/api/invoices/${id}/`, o))
+      await dq.syncNow()
     } catch (e) {
       setError(e.message)
+    } finally {
+      setForcing(false)
     }
   }
 
   const columns = useMemo(
     () => [
       columnHelper.accessor('name', {
-        header: 'Nama',
+        header: 'Name',
         cell: (c) => <span className="font-bold text-[#e5e2e1]">{c.getValue()}</span>,
         enableSorting: true,
       }),
       columnHelper.accessor('company', {
-        header: 'Perusahaan',
+        header: 'Company',
         cell: (c) => c.getValue() || <span className="text-[#a8b09a]/50">—</span>,
         enableSorting: true,
       }),
@@ -142,12 +160,12 @@ export default function Clients() {
         enableSorting: false,
       }),
       columnHelper.accessor('contact', {
-        header: 'Kontak',
+        header: 'Contact',
         cell: (c) => c.getValue() || '—',
         enableSorting: false,
       }),
       columnHelper.accessor('created_at', {
-        header: 'Sejak',
+        header: 'Since',
         cell: (c) => <span className="font-mono text-[12px] text-[#a8b09a]">{fmtDate(c.getValue())}</span>,
         enableSorting: true,
       }),
@@ -166,7 +184,7 @@ export default function Clients() {
               onClick={() => setConfirmDel(row.original)}
               className="font-mono text-[11px] text-[#ffb4ab] hover:underline"
             >
-              HAPUS
+              DELETE
             </button>
           </span>
         ),
@@ -175,8 +193,10 @@ export default function Clients() {
     []
   )
 
+  const visibleRows = useMemo(() => rows.filter((r) => !dq.hideIds.has(r.id)), [rows, dq.hideIds])
+
   const table = useReactTable({
-    data: rows,
+    data: visibleRows,
     columns,
     pageCount: Math.max(1, Math.ceil(count / PAGE_SIZE)),
     state: { pagination: { pageIndex: page, pageSize: PAGE_SIZE }, sorting },
@@ -198,30 +218,47 @@ export default function Clients() {
       <PageHead
         code="// CRM // CLIENTS"
         title="Clients"
-        desc={`${count} klien tercatat. Search + sort jalan di server.`}
-        actions={<Btn onClick={() => setModal({ mode: 'add' })}>+ Klien</Btn>}
+        desc={`${count} clients recorded. Server-side search + sort.`}
+        actions={<Btn onClick={() => setModal({ mode: 'add' })}>+ Client</Btn>}
       />
 
       <div className="flex flex-col sm:flex-row gap-3">
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Cari nama / perusahaan / email..."
+          placeholder="Search name / company / email..."
           className={`${inputCls} sm:max-w-sm`}
         />
       </div>
 
       <ErrorBox message={error} onRetry={load} />
+      <PendingBar count={queued.length} syncing={syncing} onSync={dq.syncNow} onUndo={dq.undoQueued} />
+      <FailedBox
+        failed={failed}
+        onRetry={dq.syncNow}
+        onDismiss={dq.dismissFailed}
+        actionsFor={(f) =>
+          f.data?.invoices > 0 ? (
+            <button
+              onClick={() => forceDeleteClient(f)}
+              disabled={forcing}
+              className="font-mono text-[11px] text-[#161f00] bg-[#ffb4ab] px-2 py-0.5 font-bold hover:opacity-80 disabled:opacity-50 shrink-0"
+            >
+              {forcing ? 'FORCING...' : `FORCE: DELETE ${f.data.invoices} INVOICE(S) + CLIENT`}
+            </button>
+          ) : null
+        }
+      />
 
       {loading ? (
-        <div className="py-12">
-          <Spinner label="LOADING CLIENTS..." />
+        <div className="py-24 flex justify-center">
+          <SpinnerCircle size={52} label="LOADING CLIENTS" />
         </div>
       ) : rows.length === 0 ? (
-        <Empty title="Belum ada klien" hint="Klik + Klien buat nambahin yang pertama." />
+        <Empty title="No clients yet" hint="Hit + Client to add the first one." />
       ) : (
         <>
-          <div className="border border-[#2a2a2a] bg-[#1c1b1b] overflow-x-auto sp-scroll">
+          <div className="border border-[#2a2a2a] bg-[#1c1b1b] overflow-x-auto sp-scroll" data-lenis-prevent>
             <table className="sp-table w-full min-w-[720px]">
               <thead>
                 {table.getHeaderGroups().map((hg) => (
@@ -252,7 +289,7 @@ export default function Clients() {
           </div>
           <div className="flex items-center justify-between font-mono text-[12px] text-[#a8b09a]">
             <span>
-              HAL {page + 1} / {pages} — {count} ROWS
+              PAGE {page + 1} / {pages} — {count} ROWS
             </span>
             <span className="flex gap-2">
               <Btn variant="secondary" onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0}>
@@ -273,26 +310,26 @@ export default function Clients() {
       <Modal
         open={!!modal}
         onClose={() => setModal(null)}
-        title={modal?.mode === 'edit' ? `EDIT CLIENT #${modal?.row?.id}` : 'TAMBAH KLIEN'}
+        title={modal?.mode === 'edit' ? `EDIT CLIENT #${modal?.row?.id}` : 'ADD CLIENT'}
       >
         {modal && (
           <ClientForm initial={modal.mode === 'edit' ? modal.row : null} onClose={() => setModal(null)} onSaved={load} />
         )}
       </Modal>
 
-      <Modal open={!!confirmDel} onClose={() => setConfirmDel(null)} title="HAPUS KLIEN?">
+      <Modal open={!!confirmDel} onClose={() => setConfirmDel(null)} title="DELETE CLIENT?">
         {confirmDel && (
           <div className="flex flex-col gap-4">
             <p className="text-[13px] text-[#a8b09a]">
-              Hapus <span className="text-[#e5e2e1] font-bold">{confirmDel.name}</span>? Project/invoice yang
-              nyangkut bakal ikut ke-ganggu relasinya.
+              Delete <span className="text-[#e5e2e1] font-bold">{confirmDel.name}</span>? Linked
+              projects/invoices will be affected. Queued first — sent on sync or page leave.
             </p>
             <div className="flex gap-2 justify-end">
               <Btn variant="secondary" onClick={() => setConfirmDel(null)}>
-                BATAL
+                CANCEL
               </Btn>
-              <Btn variant="primary" onClick={del} className="!bg-[#ffb4ab] !border-[#ffb4ab] !text-[#161f00]">
-                YA, HAPUS
+              <Btn variant="primary" onClick={queueDel} className="!bg-[#ffb4ab] !border-[#ffb4ab] !text-[#161f00]">
+                YES, DELETE
               </Btn>
             </div>
           </div>

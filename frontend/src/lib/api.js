@@ -30,13 +30,14 @@ export const tokenStore = {
   },
 }
 
-async function raw(path, { method = 'GET', body, token } = {}) {
+async function raw(path, { method = 'GET', body, token, ...fetchOpts } = {}) {
   const headers = { 'Content-Type': 'application/json' }
   if (token) headers.Authorization = `Bearer ${token}`
   const res = await fetch(`${BASE}${path}`, {
     method,
     headers,
     body: body !== undefined ? JSON.stringify(body) : undefined,
+    ...fetchOpts,
   })
   let data = null
   try {
@@ -88,7 +89,7 @@ export const apiGet = (path, params = {}) => {
 
 export const apiPost = (path, body) => api(path, { method: 'POST', body })
 export const apiPatch = (path, body) => api(path, { method: 'PATCH', body })
-export const apiDelete = (path) => api(path, { method: 'DELETE' })
+export const apiDelete = (path, opts = {}) => api(path, { method: 'DELETE', ...opts })
 
 export async function loginRequest(username, password) {
   const { res, data } = await raw('/api/auth/login/', {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
+import { VscEye, VscEyeClosed } from 'react-icons/vsc'
 import { useAuth } from '../lib/auth'
 import { EASE } from '../lib/anim'
 
@@ -9,6 +10,7 @@ export default function LoginModal({ open, onClose }) {
   const navigate = useNavigate()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [showPw, setShowPw] = useState(false)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
@@ -33,7 +35,7 @@ export default function LoginModal({ open, onClose }) {
       onClose()
       navigate('/space')
     } catch (err) {
-      setError(err.message || 'Login gagal.')
+      setError(err.message || 'Login failed.')
     } finally {
       setBusy(false)
     }
@@ -68,7 +70,7 @@ export default function LoginModal({ open, onClose }) {
               <button
                 onClick={onClose}
                 className="font-hud-code text-on-surface-variant hover:text-primary text-lg leading-none"
-                aria-label="Tutup"
+                aria-label="Close"
               >
                 ✕
               </button>
@@ -83,7 +85,7 @@ export default function LoginModal({ open, onClose }) {
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="fitra"
+                  placeholder="username"
                   autoComplete="username"
                   className="bg-surface-container-low border-2 border-surface-container-highest px-4 py-3 font-hud-code text-primary placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container transition-all"
                 />
@@ -92,15 +94,25 @@ export default function LoginModal({ open, onClose }) {
                 <label className="font-hud-code text-hud-code text-primary uppercase font-bold">
                   PASSPHRASE
                 </label>
-                <input
-                  required
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  autoComplete="current-password"
-                  className="bg-surface-container-low border-2 border-surface-container-highest px-4 py-3 font-hud-code text-primary placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container transition-all"
-                />
+                <div className="relative">
+                  <input
+                    required
+                    type={showPw ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="password"
+                    autoComplete="current-password"
+                    className="bg-surface-container-low border-2 border-surface-container-highest px-4 py-3 pr-12 font-hud-code text-primary placeholder:text-on-surface-variant focus:outline-none focus:border-primary-container transition-all w-full"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPw((v) => !v)}
+                    aria-label={showPw ? 'Hide password' : 'Show password'}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary-container transition-colors"
+                  >
+                    {showPw ? <VscEyeClosed size={18} /> : <VscEye size={18} />}
+                  </button>
+                </div>
               </div>
               {error && (
                 <div className="font-hud-code text-[13px] text-error border border-error px-3 py-2">

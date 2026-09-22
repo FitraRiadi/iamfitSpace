@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export function Spinner({ label = 'LOADING...' }) {
@@ -9,7 +10,19 @@ export function Spinner({ label = 'LOADING...' }) {
   )
 }
 
-export function Empty({ title = 'Belum ada data', hint = '' }) {
+export function SpinnerCircle({ size = 44, label = 'LOADING' }) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-3" role="status" aria-label={label}>
+      <span
+        className="rounded-full border-2 border-[#353534] border-t-[#c0f500] animate-spin"
+        style={{ width: size, height: size }}
+      />
+      <span className="font-mono text-[11px] tracking-[0.2em] text-[#a8b09a]">{label}</span>
+    </div>
+  )
+}
+
+export function Empty({ title = 'No data yet', hint = '' }) {
   return (
     <div className="border border-[#2a2a2a] bg-[#0e0e0e] px-6 py-10 text-center">
       <div className="font-mono text-[13px] text-[#e5e2e1] font-bold">{title}</div>
@@ -18,11 +31,10 @@ export function Empty({ title = 'Belum ada data', hint = '' }) {
   )
 }
 
-export function PageHead({ code, title, desc, actions }) {
+export function PageHead({ title, desc, actions }) {
   return (
     <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#2a2a2a] pb-5">
       <div className="flex flex-col gap-1.5">
-        <span className="font-mono text-[11px] tracking-[0.15em] text-[#c0f500]">{code}</span>
         <h1 className="font-jersey text-5xl sm:text-6xl text-[#e5e2e1] uppercase leading-none tracking-tight">
           {title}
         </h1>
@@ -85,6 +97,7 @@ export function Modal({ open, onClose, title, children, wide }) {
             exit={{ opacity: 0, y: 16 }}
             transition={{ duration: 0.2 }}
             onClick={(e) => e.stopPropagation()}
+            data-lenis-prevent
             className={`w-full ${wide ? 'max-w-2xl' : 'max-w-lg'} bg-[#1c1b1b] border border-[#353534] max-h-[90vh] overflow-y-auto sp-scroll`}
           >
             <div className="flex items-center justify-between border-b border-[#2a2a2a] px-5 py-3 sticky top-0 bg-[#1c1b1b] z-10">
@@ -92,7 +105,7 @@ export function Modal({ open, onClose, title, children, wide }) {
               <button
                 onClick={onClose}
                 className="font-mono text-[#a8b09a] hover:text-[#e5e2e1] text-lg leading-none"
-                aria-label="Tutup"
+                aria-label="Close"
               >
                 ✕
               </button>
@@ -130,9 +143,87 @@ export function ErrorBox({ message, onRetry }) {
       <span>[!] {message}</span>
       {onRetry && (
         <button onClick={onRetry} className="underline hover:no-underline shrink-0">
-          COBA LAGI
+          RETRY
         </button>
       )}
+    </div>
+  )
+}
+
+export function Toast({ toast, onClose }) {
+  useEffect(() => {
+    if (!toast) return
+    const t = setTimeout(onClose, 3200)
+    return () => clearTimeout(t)
+  }, [toast, onClose])
+  return (
+    <AnimatePresence>
+      {toast && (
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 16 }}
+          transition={{ duration: 0.2 }}
+          className={`fixed bottom-5 right-5 z-[140] max-w-xs border px-4 py-3 font-mono text-[12px] flex items-start gap-3 ${
+            toast.kind === 'error'
+              ? 'border-[#ffb4ab]/60 bg-[#1c1b1b] text-[#ffb4ab]'
+              : 'border-[#c0f500]/60 bg-[#1c1b1b] text-[#e5e2e1]'
+          }`}
+          role="status"
+        >
+          <span className={`mt-0.5 w-2 h-2 shrink-0 ${toast.kind === 'error' ? 'bg-[#ffb4ab]' : 'bg-[#c0f500]'}`} />
+          <span className="flex-1">{toast.message}</span>
+          <button onClick={onClose} className="text-[#a8b09a] hover:text-[#e5e2e1] leading-none" aria-label="Close">
+            ✕
+          </button>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
+
+export function PendingBar({ count, syncing, onSync, onUndo }) {
+  if (!count) return null
+  return (
+    <div className="border border-[#ffd791]/50 bg-[#ffd791]/5 px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
+      <span className="font-mono text-[12px] text-[#ffd791] flex-1">
+        [{count} DELETION{count > 1 ? 'S' : ''} QUEUED] — sent on sync or when you leave this page.
+      </span>
+      <span className="flex gap-2 shrink-0">
+        <Btn variant="secondary" onClick={onUndo} disabled={syncing}>
+          UNDO
+        </Btn>
+        <Btn onClick={onSync} disabled={syncing}>
+          {syncing ? 'SYNCING...' : `SYNC NOW (${count})`}
+        </Btn>
+      </span>
+    </div>
+  )
+}
+
+export function FailedBox({ failed, onRetry, onDismiss, actionsFor }) {
+  if (!failed || !failed.length) return null
+  return (
+    <div className="border border-[#ffb4ab]/50 bg-[#ffb4ab]/5 px-4 py-3 flex flex-col gap-2">
+      <span className="font-mono text-[12px] text-[#ffb4ab] font-bold">
+        [{failed.length} DELETE{failed.length > 1 ? 'S' : ''} REJECTED BY SERVER]
+      </span>
+      <ul className="flex flex-col gap-1.5">
+        {failed.map((f) => (
+          <li key={f.id} className="font-mono text-[12px] text-[#e5e2e1] flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+            <span className="flex-1">
+              {f.label} — <span className="text-[#ffb4ab]">{f.error}</span>
+            </span>
+            {actionsFor?.(f)}
+          </li>
+        ))}
+      </ul>
+      <span className="flex gap-2">
+        <Btn variant="secondary" onClick={onDismiss}>
+          DISMISS
+        </Btn>
+        <Btn onClick={onRetry}>RETRY SYNC</Btn>
+      </span>
     </div>
   )
 }

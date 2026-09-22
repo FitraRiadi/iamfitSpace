@@ -1,85 +1,130 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { apiGet, unwrapList } from '../lib/api'
-import { PageHead, Spinner, ErrorBox, Badge, fmtIDR, fmtDate } from './ui'
-
-function MoneyCard({ label, value, accent }) {
-  return (
-    <div className="border border-[#2a2a2a] bg-[#1c1b1b] p-4 flex flex-col gap-1">
-      <span className="font-mono text-[10px] tracking-[0.15em] text-[#a8b09a] uppercase">{label}</span>
-      <span className={`font-jersey text-4xl leading-none ${accent || 'text-[#e5e2e1]'}`}>{value}</span>
-    </div>
-  )
-}
+import { buildMonthWindow, mergeMonthly, MONTHS_DEFAULT } from '../lib/finance'
+import { PageHead, Btn, SpinnerCircle, ErrorBox, Badge, fmtDate } from './ui'
+import MoneyChart from './MoneyChart'
+import MoneyDonut from './MoneyDonut'
 
 export default function Overview() {
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
+  const [syncedAt, setSyncedAt] = useState(null)
+  const [refreshing, setRefreshing] = useState(false)
 
-  useEffect(() => {
-    let alive = true
-    ;(async () => {
-      try {
-        const [fin, clients, leads, projects, products, recentLeads, recentProjects] = await Promise.all([
-          apiGet('/api/finance/summary/'),
-          apiGet('/api/clients/', { page_size: 1 }),
-          apiGet('/api/leads/', { page_size: 1 }),
-          apiGet('/api/projects/', { page_size: 1 }),
-          apiGet('/api/products/', { page_size: 1 }),
-          apiGet('/api/leads/', { page_size: 5, ordering: '-updated_at' }),
-          apiGet('/api/projects/', { page_size: 5, ordering: '-updated_at' }),
-        ])
-        if (!alive) return
-        setData({
-          fin,
-          counts: {
-            clients: clients.count,
-            leads: leads.count,
-            projects: projects.count,
-            products: products.count,
-          },
-          recentLeads: unwrapList(recentLeads).rows,
-          recentProjects: unwrapList(recentProjects).rows,
-        })
-      } catch (e) {
-        if (alive) setError(e.message)
-      }
-    })()
-    return () => {
-      alive = false
+  const load = useCallback(async (silent) => {
+    if (silent) setRefreshing(true)
+    else setError('')
+    try {
+      const [fin, clients, leads, projects, products, recentLeads, recentProjects, monthly] = await Promise.all([
+        apiGet('/api/finance/summary/'),
+        apiGet('/api/clients/', { page_size: 1 }),
+        apiGet('/api/leads/', { page_size: 1 }),
+        apiGet('/api/projects/', { page_size: 1 }),
+        apiGet('/api/products/', { page_size: 1 }),
+        apiGet('/api/leads/', { page_size: 5, ordering: '-updated_at' }),
+        apiGet('/api/projects/', { page_size: 5, ordering: '-updated_at' }),
+        apiGet('/api/finance/monthly/', { months: MONTHS_DEFAULT }),
+      ])
+      setData({
+        fin,
+        counts: {
+          clients: clients.count,
+          leads: leads.count,
+          projects: projects.count,
+          products: products.count,
+        },
+        recentLeads: unwrapList(recentLeads).rows,
+        recentProjects: unwrapList(recentProjects).rows,
+        monthly: mergeMonthly(buildMonthWindow(MONTHS_DEFAULT), monthly),
+      })
+      setSyncedAt(new Date())
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setRefreshing(false)
     }
   }, [])
+
+  useEffect(() => {
+    load(false)
+  }, [load])
 
   if (error) return <ErrorBox message={error} onRetry={() => window.location.reload()} />
   if (!data)
     return (
-      <div className="py-16">
-        <Spinner label="LOADING OVERVIEW..." />
+      <div className="py-24 flex justify-center">
+        <SpinnerCircle size={52} label="LOADING OVERVIEW" />
       </div>
     )
 
-  const { fin, counts } = data
+  const { fin, counts, monthly } = data
   return (
     <div className="flex flex-col gap-8">
       <PageHead
         code="// SPACE DASHBOARD"
         title="Overview"
-        desc="Ringkasan kondisi IamFit Space: uang, pipeline, dan project aktif."
+        desc="IamFit Space at a glance: money, pipeline, and active builds. All numbers live from the API."
+        actions={<Btn variant="secondary" onClick={() => load(true)} disabled={refreshing}>{refreshing ? 'SYNCING...' : '↻ REFRESH'}</Btn>}
       />
+      {syncedAt && (
+        <div className="-mt-6 font-mono text-[11px] text-[#a8b09a]">
+          ● LIVE — synced {syncedAt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+        </div>
+      )}
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <MoneyCard label="Income" value={fmtIDR(fin.income)} accent="text-[#c0f500]" />
-        <MoneyCard label="Expense" value={fmtIDR(fin.expense)} accent="text-[#ffb4ab]" />
-        <MoneyCard label="Profit" value={fmtIDR(fin.profit)} />
-        <MoneyCard label="Outstanding" value={fmtIDR(fin.outstanding)} accent="text-[#ffd791]" />
+      <MoneyDonut income={fin.income} expense={fin.expense} outstanding={fin.outstanding} />
+
+      <div className="flex flex-wrap justify-center gap-3">
+        <MoneyChart
+          title="Income"
+          tag="LAST 12 MO"
+          total={fin.income}
+          sub="Cash in"
+          data={monthly}
+          dataKey="income"
+          color="lime"
+          className="flex-1 min-w-[280px] max-w-[560px]"
+        />
+        <MoneyChart
+          title="Expense"
+          tag="LAST 12 MO"
+          total={fin.expense}
+          sub="Cash out"
+          data={monthly}
+          dataKey="expense"
+          color="red"
+          className="flex-1 min-w-[280px] max-w-[560px]"
+          invert
+        />
+        <MoneyChart
+          title="Profit"
+          tag="LAST 12 MO"
+          total={fin.profit}
+          sub="Income minus expense"
+          data={monthly}
+          dataKey="profit"
+          color="emerald"
+          className="flex-1 min-w-[280px] max-w-[560px]"
+        />
+        <MoneyChart
+          title="Outstanding"
+          tag="BILLED / MO"
+          total={fin.outstanding}
+          sub="Open invoices now · chart shows billed"
+          data={monthly}
+          dataKey="invoiced"
+          color="amber"
+          className="flex-1 min-w-[280px] max-w-[560px]"
+        />
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="flex flex-wrap justify-center gap-3">
         {[
           ['CLIENTS', counts.clients, '/space/clients'],
           ['LEADS', counts.leads, '/space/leads'],
           ['PROJECTS', counts.projects, '/space/projects'],
-          ['PRODUCTS', counts.products, null],
+          ['PRODUCTS', counts.products, '/space/products'],
         ].map(([label, n, to]) => {
           const inner = (
             <>
@@ -88,7 +133,7 @@ export default function Overview() {
             </>
           )
           const cls =
-            'border border-[#2a2a2a] bg-[#0e0e0e] p-4 flex flex-col gap-1 transition-colors'
+            'border border-[#2a2a2a] bg-[#0e0e0e] p-4 flex flex-col gap-1 transition-colors flex-1 min-w-[150px] max-w-[320px]'
           return to ? (
             <Link key={label} to={to} className={`${cls} hover:border-[#c0f500]`}>
               {inner}
@@ -125,7 +170,7 @@ export default function Overview() {
               </li>
             ))}
             {data.recentLeads.length === 0 && (
-              <li className="px-4 py-6 text-center font-mono text-[12px] text-[#a8b09a]">Belum ada lead.</li>
+              <li className="px-4 py-6 text-center font-mono text-[12px] text-[#a8b09a]">No leads yet.</li>
             )}
           </ul>
         </div>
@@ -150,7 +195,7 @@ export default function Overview() {
               </li>
             ))}
             {data.recentProjects.length === 0 && (
-              <li className="px-4 py-6 text-center font-mono text-[12px] text-[#a8b09a]">Belum ada project.</li>
+              <li className="px-4 py-6 text-center font-mono text-[12px] text-[#a8b09a]">No projects yet.</li>
             )}
           </ul>
         </div>

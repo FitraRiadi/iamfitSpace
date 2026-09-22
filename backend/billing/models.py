@@ -55,9 +55,17 @@ class Transaction(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='transactions'
     )
     kind = models.CharField(max_length=10, choices=Kind.choices)
+    title = models.CharField(max_length=200, blank=True, default='')
     category = models.CharField(max_length=100)
     amount = models.DecimalField(max_digits=14, decimal_places=2)
     occurred_on = models.DateField()
+    lead = models.ForeignKey(
+        'crm.Lead',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='transactions',
+    )
     invoice = models.ForeignKey(
         Invoice, on_delete=models.SET_NULL, null=True, blank=True, related_name='transactions'
     )
@@ -79,4 +87,4 @@ class Transaction(models.Model):
         ]
 
     def __str__(self):
-        return f'{self.get_kind_display()} {self.amount} ({self.category})'
+        return f'{self.get_kind_display()} {self.amount} ({self.title or self.category})'

@@ -51,7 +51,11 @@ export function AuthProvider({ children }) {
     setUser(null)
   }, [])
 
-  return <AuthCtx.Provider value={{ user, ready, login, logout }}>{children}</AuthCtx.Provider>
+  const updateUser = useCallback((patch) => {
+    setUser((u) => ({ ...(u || {}), ...patch }))
+  }, [])
+
+  return <AuthCtx.Provider value={{ user, ready, login, logout, updateUser }}>{children}</AuthCtx.Provider>
 }
 
 export function useAuth() {

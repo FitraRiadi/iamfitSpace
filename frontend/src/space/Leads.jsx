@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from 'react'
-import { apiGet, apiPost, apiPatch, apiDelete } from '../lib/api'
-import { PageHead, Btn, Modal, Field, inputCls, ErrorBox, Spinner, Badge, fmtIDR, fmtDate } from './ui'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { apiGet, apiPost, apiPatch } from '../lib/api'
+import { useDeleteQueue } from '../lib/deleteQueue'
+import { PageHead, Btn, Modal, Field, inputCls, ErrorBox, SpinnerCircle, Badge, PendingBar, FailedBox, fmtIDR, fmtDate } from './ui'
 
 const STATUSES = [
   { value: 'new', label: 'NEW LEAD', color: 'gray' },
@@ -73,16 +74,16 @@ function LeadForm({ initial, clients, onClose, onSaved }) {
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
-      <Field label="Judul lead *">
-        <input required value={form.title} onChange={set('title')} className={inputCls} placeholder="cth: Company profile + CMS" />
+      <Field label="Lead title *">
+        <input required value={form.title} onChange={set('title')} className={inputCls} placeholder="e.g. Company profile + CMS" />
       </Field>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Field label="Kontak">
+        <Field label="Contact">
           <input value={form.contact} onChange={set('contact')} className={inputCls} />
         </Field>
-        <Field label="Klien terkait">
+        <Field label="Linked client">
           <select value={form.client} onChange={set('client')} className={inputCls}>
-            <option value="">— tanpa klien —</option>
+            <option value="">— no client —</option>
             {clients.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -92,7 +93,7 @@ function LeadForm({ initial, clients, onClose, onSaved }) {
         </Field>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Field label="Estimasi nilai (Rp)">
+        <Field label="Estimated value (Rp)">
           <input
             type="number"
             min="0"
@@ -114,12 +115,12 @@ function LeadForm({ initial, clients, onClose, onSaved }) {
           ))}
         </select>
       </Field>
-      <Field label="Catatan">
+      <Field label="Notes">
         <textarea rows={3} value={form.notes} onChange={set('notes')} className={`${inputCls} resize-none`} />
       </Field>
       {logs.length > 0 && (
         <div className="border border-[#2a2a2a] bg-[#0e0e0e] px-3 py-2">
-          <div className="font-mono text-[10px] tracking-[0.15em] text-[#a8b09a] mb-1.5">RIWAYAT STATUS</div>
+          <div className="font-mono text-[10px] tracking-[0.15em] text-[#a8b09a] mb-1.5">STATUS HISTORY</div>
           <ul className="flex flex-col gap-1 font-mono text-[11px] text-[#a8b09a]">
             {logs.map((g) => (
               <li key={g.id}>
@@ -131,7 +132,7 @@ function LeadForm({ initial, clients, onClose, onSaved }) {
       )}
       {error && <ErrorBox message={error} />}
       <Btn type="submit" disabled={busy}>
-        {busy ? 'MENYIMPAN...' : initial?.id ? 'SIMPAN PERUBAHAN' : '+ TAMBAH LEAD'}
+        {busy ? 'SAVING...' : initial?.id ? 'SAVE CHANGES' : '+ ADD LEAD'}
       </Btn>
     </form>
   )
@@ -169,6 +170,9 @@ export default function Leads() {
     load()
   }, [load])
 
+  const dq = useDeleteQueue('leads', load)
+  const { queued, failed, syncing } = dq
+
   const move = async (id, status) => {
     const prev = leads
     setLeads((ls) => ls.map((l) => (l.id === id ? { ...l, status } : l)))
@@ -182,19 +186,15 @@ export default function Leads() {
     }
   }
 
-  const del = async () => {
+  const queueDel = () => {
     if (!confirmDel) return
-    try {
-      await apiDelete(`/api/leads/${confirmDel.id}/`)
-      setConfirmDel(null)
-      load()
-    } catch (e) {
-      setError(e.message)
-    }
+    dq.queueOne({ id: confirmDel.id, label: confirmDel.title })
+    setConfirmDel(null)
   }
 
-  const byStatus = (s) => leads.filter((l) => l.status === s)
-  const totalPipeline = leads
+  const visibleLeads = useMemo(() => leads.filter((l) => !dq.hideIds.has(l.id)), [leads, dq.hideIds])
+  const byStatus = (s) => visibleLeads.filter((l) => l.status === s)
+  const totalPipeline = visibleLeads
     .filter((l) => !['won', 'lost'].includes(l.status))
     .reduce((a, l) => a + Number(l.value_estimate || 0), 0)
 
@@ -203,23 +203,25 @@ export default function Leads() {
       <PageHead
         code="// CRM // LEAD PIPELINE"
         title="Leads"
-        desc="Drag kartu antar kolom (desktop) atau tap kartu → tap kolom tujuan (mobile). Pindah status tercatat otomatis."
+        desc="Drag cards across columns (desktop) or tap a card → tap the target column (mobile). Moves are logged automatically."
         actions={<Btn onClick={() => setModal({ mode: 'add' })}>+ Lead</Btn>}
       />
 
       <div className="flex items-center gap-2 font-mono text-[12px]">
         <Badge color="amber">{fmtIDR(totalPipeline)} OPEN PIPELINE</Badge>
-        <Badge color="gray">{leads.length} LEADS</Badge>
+        <Badge color="gray">{visibleLeads.length} LEADS</Badge>
       </div>
 
       <ErrorBox message={error} onRetry={load} />
+      <PendingBar count={queued.length} syncing={syncing} onSync={dq.syncNow} onUndo={dq.undoQueued} />
+      <FailedBox failed={failed} onRetry={dq.syncNow} onDismiss={dq.dismissFailed} />
 
       {loading ? (
-        <div className="py-12">
-          <Spinner label="LOADING PIPELINE..." />
+        <div className="py-24 flex justify-center">
+          <SpinnerCircle size={52} label="LOADING PIPELINE" />
         </div>
       ) : (
-        <div className="flex gap-3 overflow-x-auto sp-scroll pb-4 items-start">
+        <div className="flex gap-3 overflow-x-auto sp-scroll pb-4 items-start" data-lenis-prevent>
           {STATUSES.map((s) => {
             const cards = byStatus(s.value)
             const colTotal = cards.reduce((a, l) => a + Number(l.value_estimate || 0), 0)
@@ -251,11 +253,11 @@ export default function Leads() {
                       onClick={() => move(selectedId, s.value)}
                       className="mt-2 w-full font-mono text-[11px] py-1.5 border border-dashed border-[#c0f500] text-[#c0f500] hover:bg-[#c0f500]/10"
                     >
-                      ↓ PINDAH KE SINI
+                      ↓ MOVE HERE
                     </button>
                   )}
                 </div>
-                <div className="flex flex-col gap-2 p-2.5 overflow-y-auto sp-scroll">
+                <div className="flex flex-col gap-2 p-2.5 overflow-y-auto sp-scroll" data-lenis-prevent>
                   {cards.map((l) => (
                     <div
                       key={l.id}
@@ -300,14 +302,14 @@ export default function Leads() {
                           }}
                           className="font-mono text-[11px] text-[#ffb4ab] hover:underline"
                         >
-                          HAPUS
+                          DELETE
                         </button>
                       </div>
                     </div>
                   ))}
                   {cards.length === 0 && (
                     <div className="font-mono text-[11px] text-[#a8b09a]/60 text-center py-6 border border-dashed border-[#2a2a2a]">
-                      drop di sini
+                      drop here
                     </div>
                   )}
                 </div>
@@ -317,7 +319,7 @@ export default function Leads() {
         </div>
       )}
 
-      <Modal open={!!modal} onClose={() => setModal(null)} title={modal?.mode === 'edit' ? `EDIT LEAD #${modal?.row?.id}` : 'TAMBAH LEAD'} wide>
+      <Modal open={!!modal} onClose={() => setModal(null)} title={modal?.mode === 'edit' ? `EDIT LEAD #${modal?.row?.id}` : 'ADD LEAD'} wide>
         {modal && (
           <LeadForm
             initial={modal.mode === 'edit' ? modal.row : null}
@@ -328,18 +330,19 @@ export default function Leads() {
         )}
       </Modal>
 
-      <Modal open={!!confirmDel} onClose={() => setConfirmDel(null)} title="HAPUS LEAD?">
+      <Modal open={!!confirmDel} onClose={() => setConfirmDel(null)} title="DELETE LEAD?">
         {confirmDel && (
           <div className="flex flex-col gap-4">
             <p className="text-[13px] text-[#a8b09a]">
-              Hapus <span className="text-[#e5e2e1] font-bold">{confirmDel.title}</span> beserta riwayatnya?
+              Delete <span className="text-[#e5e2e1] font-bold">{confirmDel.title}</span> with its history?
+              Queued first — sent on sync or page leave.
             </p>
             <div className="flex gap-2 justify-end">
               <Btn variant="secondary" onClick={() => setConfirmDel(null)}>
-                BATAL
+                CANCEL
               </Btn>
-              <Btn variant="primary" onClick={del} className="!bg-[#ffb4ab] !border-[#ffb4ab] !text-[#161f00]">
-                YA, HAPUS
+              <Btn variant="primary" onClick={queueDel} className="!bg-[#ffb4ab] !border-[#ffb4ab] !text-[#161f00]">
+                YES, DELETE
               </Btn>
             </div>
           </div>

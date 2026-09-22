@@ -54,3 +54,23 @@ class LeadPipelineTests(APITestCase):
         lead = Lead.objects.create(owner=self.user, title='Steady', status='contacted')
         self.client.patch(f'/api/leads/{lead.pk}/', {'notes': 'called twice'}, format='json')
         self.assertEqual(LeadStatusLog.objects.filter(lead=lead).count(), 0)
+
+
+class ClientDeleteGuardTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='fit', password='pw123456')
+        self.client.force_authenticate(self.user)
+
+    def test_delete_client_with_invoice_returns_409(self):
+        from billing.models import Invoice
+
+        client = Client.objects.create(owner=self.user, name='Big Co')
+        Invoice.objects.create(owner=self.user, client=client, number='INV-1', amount=1000)
+        res = self.client.delete(f'/api/clients/{client.pk}/')
+        self.assertEqual(res.status_code, status.HTTP_409_CONFLICT)
+        self.assertTrue(Client.objects.filter(pk=client.pk).exists())
+
+    def test_delete_clean_client_works(self):
+        client = Client.objects.create(owner=self.user, name='Solo')
+        res = self.client.delete(f'/api/clients/{client.pk}/')
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)

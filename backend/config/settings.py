@@ -120,9 +120,22 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database — SQLite when DATABASE_URL is empty, else Postgres (Supabase).
 
 DATABASE_URL = (env('DATABASE_URL', '') or '').strip().strip('"').strip("'")
-if DATABASE_URL:
+
+import sys
+
+TESTING = 'test' in sys.argv
+
+if TESTING or not DATABASE_URL:
+    # Tests always run on throwaway SQLite (fast + never touches Supabase).
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3' if not TESTING else ':memory:',
+        }
+    }
+elif DATABASE_URL:
     scheme = DATABASE_URL.split('://', 1)[0].lower()
-    if scheme not in ('postgres', 'postgresql', 'pgsql'):
+    if scheme not in ('postgres', 'postgresql', 'pgsql', 'sqlite', 'spatialite'):
         from django.core.exceptions import ImproperlyConfigured
 
         raise ImproperlyConfigured(
@@ -139,10 +152,11 @@ if DATABASE_URL:
     }
     # Fail fast instead of hanging: on Vercel a hanging connect gets the
     # whole function killed (-> opaque 500). With a timeout it becomes a
-    # clean 503 from /api/health/ that names the problem.
-    DATABASES['default'].setdefault('OPTIONS', {})['connect_timeout'] = int(
-        env('DB_CONNECT_TIMEOUT', '8')
-    )
+    # clean 503 from /api/health/ that names the problem. Postgres only.
+    if DATABASES['default']['ENGINE'].endswith('postgresql'):
+        DATABASES['default'].setdefault('OPTIONS', {})['connect_timeout'] = int(
+            env('DB_CONNECT_TIMEOUT', '8')
+        )
 else:
     DATABASES = {
         'default': {

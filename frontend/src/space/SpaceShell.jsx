@@ -1,13 +1,28 @@
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import {
+  VscGraph,
+  VscOrganization,
+  VscLayers,
+  VscBriefcase,
+  VscCreditCard,
+  VscTag,
+  VscHome,
+  VscSignOut,
+  VscSettingsGear,
+} from 'react-icons/vsc'
 import { useAuth } from '../lib/auth'
-import { Spinner } from './ui'
+import { SpinnerCircle } from './ui'
+import Topbar, { SpaceControls } from './Topbar'
 import './space.css'
 
 const NAV = [
-  { to: '/space', label: 'OVERVIEW', end: true },
-  { to: '/space/clients', label: 'CLIENTS' },
-  { to: '/space/leads', label: 'LEADS' },
-  { to: '/space/projects', label: 'PROJECTS' },
+  { to: '/space', label: 'OVERVIEW', end: true, Icon: VscGraph },
+  { to: '/space/clients', label: 'CLIENTS', Icon: VscOrganization },
+  { to: '/space/leads', label: 'LEADS', Icon: VscLayers },
+  { to: '/space/projects', label: 'PROJECTS', Icon: VscBriefcase },
+  { to: '/space/finance', label: 'FINANCE', Icon: VscCreditCard },
+  { to: '/space/products', label: 'PRODUCTS', Icon: VscTag },
+  { to: '/space/settings', label: 'SETTINGS', Icon: VscSettingsGear },
 ]
 
 export function RequireAuth({ children }) {
@@ -16,7 +31,7 @@ export function RequireAuth({ children }) {
   if (!ready) {
     return (
       <div className="space-theme min-h-screen bg-[#131313] flex items-center justify-center">
-        <Spinner label="VERIFYING SESSION..." />
+        <SpinnerCircle size={52} label="VERIFYING SESSION" />
       </div>
     )
   }
@@ -27,7 +42,7 @@ export function RequireAuth({ children }) {
           <div className="font-mono text-[12px] text-[#c0f500] tracking-[0.2em]">[ LOCKED ]</div>
           <h1 className="font-jersey text-5xl uppercase mt-2">Restricted area</h1>
           <p className="text-[13px] text-[#a8b09a] mt-2">
-            Area khusus operator. Masuk lewat pintu rahasia, bukan URL langsung.
+            Operator-only area. Enter through the secret gate, not by direct URL.
           </p>
           <Link
             to="/"
@@ -43,27 +58,35 @@ export function RequireAuth({ children }) {
   return children
 }
 
-function NavItems({ onNav }) {
+function NavItems({ onNav, rail }) {
   return (
     <>
-      {NAV.map((n) => (
+      {NAV.map(({ to, label, end, Icon }) => (
         <NavLink
-          key={n.to}
-          to={n.to}
-          end={n.end}
+          key={to}
+          to={to}
+          end={end}
           onClick={onNav}
+          title={label}
+          aria-label={label}
           className={({ isActive }) =>
-            `flex items-center justify-between px-4 py-2.5 border-l-2 font-mono text-[12px] tracking-wider transition-colors ${
+            `flex items-center justify-center transition-colors relative ${
+              rail ? 'w-11 h-11' : 'w-10 h-10 shrink-0'
+            } ${
               isActive
-                ? 'border-[#c0f500] bg-[#c0f500]/10 text-[#c0f500] font-bold'
-                : 'border-transparent text-[#a8b09a] hover:text-[#e5e2e1] hover:bg-white/[0.03]'
+                ? 'text-[#c0f500] bg-[#c0f500]/10'
+                : 'text-[#a8b09a] hover:text-[#e5e2e1] hover:bg-white/[0.04]'
             }`
           }
         >
           {({ isActive }) => (
             <>
-              <span>[ {n.label} ]</span>
-              {isActive && <span className="w-1.5 h-1.5 bg-[#c0f500]" />}
+              {isActive && (
+                <span
+                  className={`absolute bg-[#c0f500] ${rail ? 'left-0 top-2 bottom-2 w-[3px]' : 'bottom-0 left-2 right-2 h-[2px]'}`}
+                />
+              )}
+              <Icon size={20} />
             </>
           )}
         </NavLink>
@@ -73,7 +96,7 @@ function NavItems({ onNav }) {
 }
 
 export default function SpaceShell() {
-  const { user, logout } = useAuth()
+  const { logout } = useAuth()
   const navigate = useNavigate()
 
   const out = () => {
@@ -83,67 +106,79 @@ export default function SpaceShell() {
 
   return (
     <div className="space-theme min-h-screen bg-[#131313] text-[#e5e2e1] flex flex-col md:flex-row">
-      {/* Sidebar (desktop) */}
-      <aside className="hidden md:flex w-60 shrink-0 flex-col border-r border-[#2a2a2a] bg-[#0e0e0e] min-h-screen sticky top-0 h-screen">
-        <div className="px-5 py-5 border-b border-[#2a2a2a]">
-          <div className="font-jersey text-3xl uppercase leading-none">IamFit Space</div>
-          <div className="font-mono text-[10px] tracking-[0.2em] text-[#c0f500] mt-1">OPERATOR CONSOLE</div>
-        </div>
-        <nav className="flex flex-col gap-0.5 p-3">
-          <NavItems />
+      {/* Sidebar icon rail (desktop) */}
+      <aside className="hidden md:flex w-[68px] shrink-0 flex-col items-center border-r border-[#2a2a2a] bg-[#0e0e0e] min-h-screen sticky top-0 h-screen py-4 gap-1">
+        <Link
+          to="/space"
+          title="IAMFIT SPACE — OVERVIEW"
+          className="w-11 h-11 mb-4 bg-[#c0f500] text-[#161f00] flex items-center justify-center font-jersey text-xl font-bold"
+        >
+          IF
+        </Link>
+        <nav className="flex flex-col gap-1">
+          <NavItems rail />
         </nav>
-        <div className="mt-auto p-4 border-t border-[#2a2a2a] flex flex-col gap-3">
-          <div className="font-mono text-[11px] text-[#a8b09a]">
-            LOGIN AS <span className="text-[#e5e2e1] font-bold">{user?.username || '—'}</span>
-          </div>
-          <div className="flex gap-2">
-            <Link
-              to="/"
-              className="flex-1 text-center px-3 py-2 border border-[#353534] font-mono text-[11px] tracking-wider text-[#a8b09a] hover:text-[#e5e2e1] hover:border-[#a8b09a] transition-colors"
-            >
-              ← SITE
-            </Link>
-            <button
-              onClick={out}
-              className="flex-1 px-3 py-2 border border-[#353534] font-mono text-[11px] tracking-wider text-[#ffb4ab] hover:border-[#ffb4ab] transition-colors"
-            >
-              LOGOUT
-            </button>
-          </div>
+        <div className="mt-auto flex flex-col items-center gap-1">
+          <Link
+            to="/"
+            title="Back to site"
+            aria-label="Back to site"
+            className="w-11 h-11 flex items-center justify-center text-[#a8b09a] hover:text-[#e5e2e1] hover:bg-white/[0.04] transition-colors"
+          >
+            <VscHome size={20} />
+          </Link>
+          <button
+            onClick={out}
+            title="Logout"
+            aria-label="Logout"
+            className="w-11 h-11 flex items-center justify-center text-[#a8b09a] hover:text-[#ffb4ab] hover:bg-white/[0.04] transition-colors"
+          >
+            <VscSignOut size={20} />
+          </button>
         </div>
       </aside>
 
       {/* Mobile topbar */}
       <div className="md:hidden border-b border-[#2a2a2a] bg-[#0e0e0e] sticky top-0 z-40">
-        <div className="flex items-center justify-between px-4 py-3">
-          <div>
-            <div className="font-jersey text-2xl uppercase leading-none">IamFit Space</div>
-            <div className="font-mono text-[9px] tracking-[0.2em] text-[#c0f500]">OPERATOR CONSOLE</div>
-          </div>
-          <div className="flex gap-2">
+        <div className="flex items-center justify-between px-4 py-2.5">
+          <Link to="/space" className="flex items-center gap-2">
+            <span className="w-8 h-8 bg-[#c0f500] text-[#161f00] flex items-center justify-center font-jersey text-base font-bold">
+              IF
+            </span>
+            <span className="font-mono text-[9px] tracking-[0.2em] text-[#c0f500]">OPERATOR</span>
+          </Link>
+          <div className="flex items-center gap-0.5">
+            <SpaceControls compact />
             <Link
               to="/"
-              className="px-3 py-2 border border-[#353534] font-mono text-[11px] text-[#a8b09a]"
+              title="Back to site"
+              aria-label="Back to site"
+              className="w-10 h-10 flex items-center justify-center text-[#a8b09a]"
             >
-              SITE
+              <VscHome size={20} />
             </Link>
             <button
               onClick={out}
-              className="px-3 py-2 border border-[#353534] font-mono text-[11px] text-[#ffb4ab]"
+              title="Logout"
+              aria-label="Logout"
+              className="w-10 h-10 flex items-center justify-center text-[#a8b09a]"
             >
-              OUT
+              <VscSignOut size={20} />
             </button>
           </div>
         </div>
-        <nav className="flex gap-1 overflow-x-auto sp-scroll px-3 pb-3">
+        <nav className="flex gap-1 overflow-x-auto sp-scroll px-3 pb-2.5">
           <NavItems />
         </nav>
       </div>
 
-      {/* Content */}
-      <main className="flex-1 min-w-0 px-4 sm:px-8 py-8 max-w-6xl w-full mx-auto">
-        <Outlet />
-      </main>
+      {/* Content column: slim topbar + page */}
+      <div className="flex-1 min-w-0 flex flex-col">
+        <Topbar />
+        <main className="flex-1 min-w-0 px-3 sm:px-5 py-5 w-full">
+          <Outlet />
+        </main>
+      </div>
     </div>
   )
 }

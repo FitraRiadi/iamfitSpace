@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from 'react'
-import { apiGet, apiPost, apiPatch, apiDelete } from '../lib/api'
-import { PageHead, Btn, Modal, Field, inputCls, Empty, ErrorBox, Spinner, Badge, fmtIDR, fmtDate } from './ui'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { apiGet, apiPost, apiPatch } from '../lib/api'
+import { useDeleteQueue } from '../lib/deleteQueue'
+import { PageHead, Btn, Modal, Field, inputCls, Empty, ErrorBox, SpinnerCircle, Badge, PendingBar, FailedBox, fmtIDR, fmtDate } from './ui'
 
 const STATUS_OPTS = [
   ['planning', 'PLANNING'],
@@ -60,11 +61,11 @@ function ProjectForm({ initial, clients, onClose, onSaved }) {
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
-      <Field label="Nama project *">
+      <Field label="Project name *">
         <input required value={form.name} onChange={set('name')} className={inputCls} />
       </Field>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Field label="Cabang">
+        <Field label="Branch">
           <select value={form.branch} onChange={set('branch')} className={inputCls}>
             {BRANCH_OPTS.map(([v, l]) => (
               <option key={v} value={v}>{l}</option>
@@ -78,9 +79,9 @@ function ProjectForm({ initial, clients, onClose, onSaved }) {
             ))}
           </select>
         </Field>
-        <Field label="Klien">
+        <Field label="Client">
           <select value={form.client} onChange={set('client')} className={inputCls}>
-            <option value="">— tanpa klien —</option>
+            <option value="">— no client —</option>
             {clients.map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
@@ -91,7 +92,7 @@ function ProjectForm({ initial, clients, onClose, onSaved }) {
         <Field label="Deadline">
           <input type="date" value={form.deadline} onChange={set('deadline')} className={inputCls} />
         </Field>
-        <Field label="Nilai kontrak (Rp)">
+        <Field label="Contract value (Rp)">
           <input type="number" min="0" value={form.contract_value} onChange={set('contract_value')} className={inputCls} />
         </Field>
         <Field label={`Progress — ${form.progress}%`}>
@@ -106,15 +107,15 @@ function ProjectForm({ initial, clients, onClose, onSaved }) {
           <input value={form.repo_url} onChange={set('repo_url')} className={inputCls} placeholder="https://" />
         </Field>
       </div>
-      <Field label="Deskripsi">
+      <Field label="Description">
         <textarea rows={2} value={form.description} onChange={set('description')} className={`${inputCls} resize-none`} />
       </Field>
-      <Field label="Catatan">
+      <Field label="Notes">
         <textarea rows={2} value={form.notes} onChange={set('notes')} className={`${inputCls} resize-none`} />
       </Field>
       {error && <ErrorBox message={error} />}
       <Btn type="submit" disabled={busy}>
-        {busy ? 'MENYIMPAN...' : initial?.id ? 'SIMPAN PERUBAHAN' : '+ TAMBAH PROJECT'}
+        {busy ? 'SAVING...' : initial?.id ? 'SAVE CHANGES' : '+ ADD PROJECT'}
       </Btn>
     </form>
   )
@@ -150,18 +151,17 @@ export default function Projects() {
     load()
   }, [load])
 
-  const del = async () => {
+  // Batched deletes via shared hook (auto-flush on enter/leave/close).
+  const dq = useDeleteQueue('projects', load)
+  const { queued, failed, syncing } = dq
+  const queueDel = () => {
     if (!confirmDel) return
-    try {
-      await apiDelete(`/api/projects/${confirmDel.id}/`)
-      setConfirmDel(null)
-      load()
-    } catch (e) {
-      setError(e.message)
-    }
+    dq.queueOne({ id: confirmDel.id, label: confirmDel.name })
+    setConfirmDel(null)
   }
 
-  const activeValue = rows
+  const visibleRows = useMemo(() => rows.filter((r) => !dq.hideIds.has(r.id)), [rows, dq.hideIds])
+  const activeValue = visibleRows
     .filter((p) => !['completed', 'archived'].includes(p.status))
     .reduce((a, p) => a + Number(p.contract_value || 0), 0)
 
@@ -170,43 +170,45 @@ export default function Projects() {
       <PageHead
         code="// OPS // PROJECTS"
         title="Projects"
-        desc="Semua build yang jalan: web, game, store, labs."
+        desc="Every build in motion: web, game, store, labs."
         actions={<Btn onClick={() => setModal({ mode: 'add' })}>+ Project</Btn>}
       />
 
       <div className="flex flex-wrap items-center gap-2">
         <select value={statusF} onChange={(e) => setStatusF(e.target.value)} className={`${inputCls} !w-auto`}>
-          <option value="">SEMUA STATUS</option>
+          <option value="">ALL STATUSES</option>
           {STATUS_OPTS.map(([v, l]) => (
             <option key={v} value={v}>{l}</option>
           ))}
         </select>
         <Badge color="lime">{fmtIDR(activeValue)} ACTIVE VALUE</Badge>
-        <Badge color="gray">{rows.length} PROJECTS</Badge>
+        <Badge color="gray">{visibleRows.length} PROJECTS</Badge>
       </div>
 
       <ErrorBox message={error} onRetry={load} />
+      <PendingBar count={queued.length} syncing={syncing} onSync={dq.syncNow} onUndo={dq.undoQueued} />
+      <FailedBox failed={failed} onRetry={dq.syncNow} onDismiss={dq.dismissFailed} />
 
       {loading ? (
-        <div className="py-12"><Spinner label="LOADING PROJECTS..." /></div>
+        <div className="py-24 flex justify-center"><SpinnerCircle size={52} label="LOADING PROJECTS" /></div>
       ) : rows.length === 0 ? (
-        <Empty title="Belum ada project" hint="Klik + Project buat mulai tracking." />
+        <Empty title="No projects yet" hint="Hit + Project to start tracking." />
       ) : (
-        <div className="border border-[#2a2a2a] bg-[#1c1b1b] overflow-x-auto sp-scroll">
+        <div className="border border-[#2a2a2a] bg-[#1c1b1b] overflow-x-auto sp-scroll" data-lenis-prevent>
           <table className="sp-table w-full min-w-[820px]">
             <thead>
               <tr>
                 <th>Project</th>
-                <th>Cabang</th>
+                <th>Branch</th>
                 <th>Status</th>
                 <th>Progress</th>
                 <th>Deadline</th>
-                <th className="!text-right">Nilai</th>
+                <th className="!text-right">Value</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
-              {rows.map((p) => (
+              {visibleRows.map((p) => (
                 <tr key={p.id}>
                   <td>
                     <div className="font-bold text-[#e5e2e1]">{p.name}</div>
@@ -227,7 +229,7 @@ export default function Projects() {
                   <td>
                     <span className="flex gap-2 justify-end">
                       <button onClick={() => setModal({ mode: 'edit', row: p })} className="font-mono text-[11px] text-[#c0f500] hover:underline">EDIT</button>
-                      <button onClick={() => setConfirmDel(p)} className="font-mono text-[11px] text-[#ffb4ab] hover:underline">HAPUS</button>
+                      <button onClick={() => setConfirmDel(p)} className="font-mono text-[11px] text-[#ffb4ab] hover:underline">DELETE</button>
                     </span>
                   </td>
                 </tr>
@@ -237,7 +239,7 @@ export default function Projects() {
         </div>
       )}
 
-      <Modal open={!!modal} onClose={() => setModal(null)} title={modal?.mode === 'edit' ? `EDIT PROJECT #${modal?.row?.id}` : 'TAMBAH PROJECT'} wide>
+      <Modal open={!!modal} onClose={() => setModal(null)} title={modal?.mode === 'edit' ? `EDIT PROJECT #${modal?.row?.id}` : 'ADD PROJECT'} wide>
         {modal && (
           <ProjectForm
             initial={modal.mode === 'edit' ? modal.row : null}
@@ -248,16 +250,16 @@ export default function Projects() {
         )}
       </Modal>
 
-      <Modal open={!!confirmDel} onClose={() => setConfirmDel(null)} title="HAPUS PROJECT?">
+      <Modal open={!!confirmDel} onClose={() => setConfirmDel(null)} title="DELETE PROJECT?">
         {confirmDel && (
           <div className="flex flex-col gap-4">
             <p className="text-[13px] text-[#a8b09a]">
-              Hapus <span className="text-[#e5e2e1] font-bold">{confirmDel.name}</span>? Invoice/transaksi yang
-              nyangkut jadi yatim.
+              Delete <span className="text-[#e5e2e1] font-bold">{confirmDel.name}</span>? Linked invoices/transactions will be orphaned.
+              Queued first — sent on sync or page leave.
             </p>
             <div className="flex gap-2 justify-end">
-              <Btn variant="secondary" onClick={() => setConfirmDel(null)}>BATAL</Btn>
-              <Btn variant="primary" onClick={del} className="!bg-[#ffb4ab] !border-[#ffb4ab] !text-[#161f00]">YA, HAPUS</Btn>
+              <Btn variant="secondary" onClick={() => setConfirmDel(null)}>CANCEL</Btn>
+              <Btn variant="primary" onClick={queueDel} className="!bg-[#ffb4ab] !border-[#ffb4ab] !text-[#161f00]">YES, DELETE</Btn>
             </div>
           </div>
         )}
