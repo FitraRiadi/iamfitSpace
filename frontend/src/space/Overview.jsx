@@ -9,7 +9,6 @@ import MoneyDonut from './MoneyDonut'
 export default function Overview() {
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
-  const [syncedAt, setSyncedAt] = useState(null)
   const [refreshing, setRefreshing] = useState(false)
 
   const load = useCallback(async (silent) => {
@@ -38,7 +37,6 @@ export default function Overview() {
         recentProjects: unwrapList(recentProjects).rows,
         monthly: mergeMonthly(buildMonthWindow(MONTHS_DEFAULT), monthly),
       })
-      setSyncedAt(new Date())
     } catch (e) {
       setError(e.message)
     } finally {
@@ -67,12 +65,6 @@ export default function Overview() {
         desc="IamFit Space at a glance: money, pipeline, and active builds. All numbers live from the API."
         actions={<Btn variant="secondary" onClick={() => load(true)} disabled={refreshing}>{refreshing ? 'SYNCING...' : '↻ REFRESH'}</Btn>}
       />
-      {syncedAt && (
-        <div className="-mt-6 font-mono text-[11px] text-[#a8b09a]">
-          ● LIVE — synced {syncedAt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-        </div>
-      )}
-
       <MoneyDonut income={fin.income} expense={fin.expense} outstanding={fin.outstanding} />
 
       <div className="flex flex-wrap justify-center gap-3">

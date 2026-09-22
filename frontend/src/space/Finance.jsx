@@ -1,16 +1,21 @@
 import { useCallback, useEffect, useState } from 'react'
+import { VscEye } from 'react-icons/vsc'
 import { apiGet, apiPost, apiPatch } from '../lib/api'
 import { useDeleteQueue } from '../lib/deleteQueue'
-import { PageHead, Btn, Modal, Field, inputCls, Empty, ErrorBox, SpinnerCircle, Badge, PendingBar, FailedBox, fmtIDR, fmtDate } from './ui'
+import { useTasks } from '../lib/tasks'
+import brandLogo from '../assets/iamfit-brand.png'
+import { PageHead, Btn, Modal, Field, TInput, TTextarea, TSelect, TSelectItem, TSlider, Empty, ErrorBox, SpinnerCircle, Badge, PendingBar, FailedBox, fmtIDR, fmtDate } from './ui'
 
 const KIND_OPTS = [['income', 'INCOME'], ['expense', 'EXPENSE']]
 const INCOME_CATS = ['Website Development', 'Maintenance', 'Consultation', 'Other Services']
 const EXPENSE_CATS = ['Hosting', 'Domain', 'Software', 'Asset', 'Operational']
 
 const INV_STATUS = [['draft', 'DRAFT'], ['sent', 'SENT'], ['paid', 'PAID'], ['overdue', 'OVERDUE'], ['cancelled', 'CANCELLED']]
+const DEAL_STATUS_COLOR = { new: 'gray', contacted: 'blue', discussion: 'blue', proposal_sent: 'amber', negotiation: 'amber', won: 'lime', lost: 'red' }
 const today = () => new Date().toISOString().slice(0, 10)
 
 function TxnForm({ initial, wonDeals, clients, onClose, onSaved }) {
+  const { track } = useTasks()
   const [form, setForm] = useState(() => ({
     kind: initial?.kind || 'income',
     title: initial?.title || '',
@@ -19,44 +24,40 @@ function TxnForm({ initial, wonDeals, clients, onClose, onSaved }) {
     occurred_on: initial?.occurred_on || today(),
     notes: initial?.notes || '',
     lead: initial?.lead || '',
+    invoice: initial?.invoice || '',
     autoInvoice: false,
     invoiceClient: initial?.invoice ? '' : '',
     invoiceDue: '',
   }))
+  const [dealIds, setDealIds] = useState(() => (initial?.lead ? [initial.lead] : []))
   const [source, setSource] = useState(initial?.lead ? 'deal' : 'manual')
-  const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
   const cats = form.kind === 'income' ? INCOME_CATS : EXPENSE_CATS
 
-  const pickDeal = (e) => {
-    const id = e.target.value
-    const deal = (wonDeals || []).find((d) => String(d.id) === String(id))
-    if (!deal) {
-      setForm((f) => ({ ...f, lead: '' }))
-      return
-    }
-    // Deal wins: title + amount overwritten from the won lead.
-    setForm((f) => ({
-      ...f,
-      lead: deal.id,
-      title: deal.title,
-      amount: deal.value_estimate ?? f.amount,
-      invoiceClient: deal.client || f.invoiceClient,
-    }))
+  const toggleDeal = (deal) => {
+    setDealIds((prev) => {
+      const has = prev.map(String).includes(String(deal.id))
+      const next = has ? prev.filter((x) => String(x) !== String(deal.id)) : [...prev, deal.id]
+      const picked = (wonDeals || []).filter((d) => next.map(String).includes(String(d.id)))
+      const total = picked.reduce((a, d) => a + Number(d.value_estimate || 0), 0)
+      setForm((f) => ({
+        ...f,
+        lead: next[0] || '',
+        title: picked.map((d) => d.title).join(' + '),
+        amount: picked.length ? total : f.amount,
+        invoiceClient: picked[0]?.client || f.invoiceClient,
+      }))
+      return next
+    })
   }
 
-  const changeKind = (e) => {
-    const kind = e.target.value
+  const changeKind = (kind) => {
     setForm((f) => ({ ...f, kind, category: '', ...(kind !== 'income' ? { lead: '' } : {}) }))
     if (kind !== 'income') setSource('manual')
   }
 
   const submit = async (e) => {
     e.preventDefault()
-    if (busy) return
-    setBusy(true)
-    setError('')
     const payload = {
       kind: form.kind,
       title: form.title,
@@ -65,19 +66,18 @@ function TxnForm({ initial, wonDeals, clients, onClose, onSaved }) {
       occurred_on: form.occurred_on,
       notes: form.notes,
       lead: form.lead || null,
+      invoice: form.invoice || null,
       auto_invoice: form.kind === 'income' && form.autoInvoice,
       invoice_client: form.invoiceClient || null,
       invoice_due_date: form.invoiceDue || null,
     }
+    onClose()
     try {
-      if (initial?.id) await apiPatch(`/api/transactions/${initial.id}/`, payload)
-      else await apiPost('/api/transactions/', payload)
+      if (initial?.id) await track(apiPatch(`/api/transactions/${initial.id}/`, payload), `UPDATE TRANSACTION — ${form.title || form.category}`)
+      else await track(apiPost('/api/transactions/', payload), `CREATE TRANSACTION — ${form.title || form.category}`)
       onSaved()
-      onClose()
-    } catch (err) {
-      setError(err.data?.amount?.[0] || err.data?.occurred_on?.[0] || err.message)
-    } finally {
-      setBusy(false)
+    } catch {
+      // failed task stays visible in the stack for retry/dismiss
     }
   }
 
@@ -85,14 +85,14 @@ function TxnForm({ initial, wonDeals, clients, onClose, onSaved }) {
     <form onSubmit={submit} className="flex flex-col gap-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Kind">
-          <select value={form.kind} onChange={changeKind} className={inputCls}>
+          <TSelect value={form.kind} onValueChange={changeKind} placeholder="Select kind">
             {KIND_OPTS.map(([v, l]) => (
-              <option key={v} value={v}>{l}</option>
+              <TSelectItem key={v} value={v}>{l}</TSelectItem>
             ))}
-          </select>
+          </TSelect>
         </Field>
         <Field label="Amount (Rp) *">
-          <input required type="number" min="0" value={form.amount} onChange={set('amount')} className={inputCls} />
+          <TInput required type="number" min="0" value={form.amount} onChange={set('amount')} />
         </Field>
       </div>
       {form.kind === 'income' && (
@@ -114,45 +114,68 @@ function TxnForm({ initial, wonDeals, clients, onClose, onSaved }) {
             ))}
           </div>
           {source === 'deal' && (
-            <Field label="Select won deal *">
-              <select value={form.lead} onChange={pickDeal} className={inputCls} required={source === 'deal'}>
-                <option value="">— pick a won deal —</option>
-                {(wonDeals || []).map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.title} — {fmtIDR(d.value_estimate)}
-                  </option>
-                ))}
-              </select>
-            </Field>
+            <div className="flex flex-col gap-1.5">
+              <span className="font-mono text-[11px] tracking-[0.1em] text-[#a8b09a] uppercase">
+                Select won deals (title + amount auto-filled, summed)
+              </span>
+              {(wonDeals || []).length === 0 ? (
+                <span className="font-mono text-[12px] text-[#a8b09a]">No won deals yet.</span>
+              ) : (
+                <ul className="flex flex-col gap-1.5 max-h-44 overflow-y-auto sp-scroll" data-lenis-prevent>
+                  {(wonDeals || []).map((d) => {
+                    const on = dealIds.map(String).includes(String(d.id))
+                    return (
+                      <li key={d.id}>
+                        <label className={`flex items-center gap-3 px-3 py-2 border cursor-pointer transition-colors ${on ? 'border-[#c0f500] bg-[#c0f500]/10' : 'border-[#2a2a2a] hover:border-[#a8b09a]'}`}>
+                          <input
+                            type="checkbox"
+                            checked={on}
+                            onChange={() => toggleDeal(d)}
+                            className="w-4 h-4 accent-[#c0f500]"
+                          />
+                          <span className="flex-1 min-w-0">
+                            <span className="block text-[13px] font-bold truncate">{d.title}</span>
+                            <span className="block font-mono text-[11px] text-[#a8b09a]">{fmtIDR(d.value_estimate)}</span>
+                          </span>
+                        </label>
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
+            </div>
           )}
         </div>
       )}
       <Field label="Title / Name *">
-        <input
+        <TInput
           required
           value={form.title}
           onChange={set('title')}
-          className={inputCls}
           placeholder={source === 'deal' ? 'Auto-filled from deal' : 'e.g. DP Website Apex'}
         />
       </Field>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Category *">
-          <select value={form.category} onChange={set('category')} className={inputCls} required>
-            <option value="">— select —</option>
+          <TSelect
+            value={form.category}
+            onValueChange={(v) => setForm((f) => ({ ...f, category: v }))}
+            placeholder="— select —"
+          >
+            <TSelectItem value="">— select —</TSelectItem>
             {cats.map((c) => (
-              <option key={c} value={c}>{c}</option>
+              <TSelectItem key={c} value={c}>{c}</TSelectItem>
             ))}
-          </select>
+          </TSelect>
         </Field>
         <Field label="Date *">
-          <input required type="date" value={form.occurred_on} onChange={set('occurred_on')} className={inputCls} />
+          <TInput required type="date" value={form.occurred_on} onChange={set('occurred_on')} />
         </Field>
       </div>
       <Field label="Notes">
-        <textarea rows={2} value={form.notes} onChange={set('notes')} className={`${inputCls} resize-none`} />
+        <TTextarea rows={2} value={form.notes} onChange={set('notes')} />
       </Field>
-      {form.kind === 'income' && !initial?.id && (
+      {form.kind === 'income' && !initial?.id && !initial?.invoice && (
         <div className="border border-[#2a2a2a] bg-[#0e0e0e] p-3 flex flex-col gap-3">
           <label className="flex items-center gap-3 cursor-pointer select-none">
             <input
@@ -163,40 +186,39 @@ function TxnForm({ initial, wonDeals, clients, onClose, onSaved }) {
             />
             <span className="font-mono text-[12px] tracking-wider text-[#e5e2e1] font-bold">
               AUTO INVOICE{' '}
-              <span className="text-[#a8b09a] font-normal">— creates draft INV-YYYY/MM/DD-{'{id}'}</span>
+              <span className="text-[#a8b09a] font-normal">— creates PAID INV-YYYY/MM/DD-{'{id}'}</span>
             </span>
           </label>
           {form.autoInvoice && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Invoice client *">
-                <select
-                  value={form.invoiceClient}
-                  onChange={set('invoiceClient')}
-                  className={inputCls}
-                  required={form.autoInvoice}
+                <TSelect
+                  value={String(form.invoiceClient ?? '')}
+                  onValueChange={(v) => setForm((f) => ({ ...f, invoiceClient: v === '' ? '' : Number(v) }))}
+                  placeholder="— select —"
                 >
-                  <option value="">— select —</option>
+                  <TSelectItem value="">— select —</TSelectItem>
                   {clients.map((c) => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
+                    <TSelectItem key={c.id} value={String(c.id)}>{c.name}</TSelectItem>
                   ))}
-                </select>
+                </TSelect>
               </Field>
               <Field label="Invoice due date">
-                <input type="date" value={form.invoiceDue} onChange={set('invoiceDue')} className={inputCls} />
+                <TInput type="date" value={form.invoiceDue} onChange={set('invoiceDue')} />
               </Field>
             </div>
           )}
         </div>
       )}
-      {error && <ErrorBox message={error} />}
-      <Btn type="submit" disabled={busy}>
-        {busy ? 'SAVING...' : initial?.id ? 'SAVE CHANGES' : '+ ADD TRANSACTION'}
+      <Btn type="submit">
+        {initial?.id ? 'SAVE CHANGES' : '+ ADD TRANSACTION'}
       </Btn>
     </form>
   )
 }
 
-function InvoiceForm({ initial, clients, onClose, onSaved }) {
+function InvoiceForm({ initial, clients, wonDeals, allDeals, invoices, onClose, onSaved }) {
+  const { track } = useTasks()
   const [form, setForm] = useState(() => ({
     number: initial?.number || '',
     client: initial?.client || '',
@@ -205,97 +227,257 @@ function InvoiceForm({ initial, clients, onClose, onSaved }) {
     due_date: initial?.due_date || '',
     notes: initial?.notes || '',
   }))
-  const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
+  const [deals, setDeals] = useState(() => initial?.leads || [])
+  const [discount, setDiscount] = useState(() => initial?.discount_percent ?? 0)
+  const [items, setItems] = useState(() => (initial?.items || []).map((it) => ({ description: it.description || '', amount: it.amount ?? '' })))
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
+
+  // Deals of this client, ANY status (won not required — DP/other flows too).
+  const clientDeals = (allDeals || []).filter((d) => form.client && String(d.client) === String(form.client))
+  const billedByDeal = {}
+  for (const v of invoices || []) {
+    if (initial?.id && v.id === initial.id) continue
+    for (const lid of v.leads || []) {
+      billedByDeal[lid] = billedByDeal[lid] || []
+      billedByDeal[lid].push(v.number)
+    }
+  }
+
+  const toggleDeal = (deal) => {
+    setDeals((prev) => {
+      const has = prev.map(String).includes(String(deal.id))
+      return has ? prev.filter((x) => String(x) !== String(deal.id)) : [...prev, deal.id]
+    })
+  }
+
+  const subtotal = (allDeals || [])
+    .filter((d) => deals.map(String).includes(String(d.id)))
+    .reduce((a, d) => a + Number(d.value_estimate || 0), 0)
+  const itemsTotal = items.reduce((a, it) => a + (Number(it.amount) || 0), 0)
+  // Hybrid: anything checked/typed -> auto (locked). Nothing at all -> manual.
+  const auto = deals.length > 0 || items.some((it) => (it.description || '').trim() || Number(it.amount) > 0)
+  const finalAmount = auto
+    ? Math.round((subtotal + itemsTotal) * (1 - (Number(discount) || 0) / 100))
+    : Math.round(Number(form.amount) || 0)
+
+  const changeClient = (v) => {
+    setForm((f) => ({ ...f, client: v === '' ? '' : Number(v) }))
+    setDeals([])
+  }
+
+  const addItem = () => setItems((p) => [...p, { description: '', amount: '' }])
+  const setItem = (i, k, v) => setItems((p) => p.map((it, x) => (x === i ? { ...it, [k]: v } : it)))
+  const delItem = (i) => setItems((p) => p.filter((_, x) => x !== i))
 
   const submit = async (e) => {
     e.preventDefault()
-    if (busy) return
-    setBusy(true)
-    setError('')
-    const payload = { ...form, client: form.client || null, due_date: form.due_date || null }
+    const itemsPayload = items
+      .filter((it) => (it.description || '').trim() && Number(it.amount) > 0)
+      .map((it, i) => ({ description: it.description.trim(), amount: it.amount, position: i }))
+    const payload = {
+      number: form.number || '',
+      client: form.client || null,
+      amount: finalAmount,
+      discount_percent: auto ? Number(discount) || 0 : 0,
+      status: form.status,
+      due_date: form.due_date || null,
+      notes: form.notes,
+      leads: deals,
+      items: itemsPayload,
+    }
+    onClose()
     try {
-      if (initial?.id) await apiPatch(`/api/invoices/${initial.id}/`, payload)
-      else await apiPost('/api/invoices/', payload)
+      if (initial?.id) await track(apiPatch(`/api/invoices/${initial.id}/`, payload), `UPDATE INVOICE — ${initial.number || ''}`)
+      else await track(apiPost('/api/invoices/', payload), `CREATE INVOICE — ${fmtIDR(form.amount)}`)
       onSaved()
-      onClose()
-    } catch (err) {
-      setError(err.data?.number?.[0] || err.data?.client?.[0] || err.message)
-    } finally {
-      setBusy(false)
+    } catch {
+      // failed task stays visible in the stack for retry/dismiss
     }
   }
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Field label="Number *">
-          <input required value={form.number} onChange={set('number')} className={inputCls} placeholder="INV-2026-002" />
-        </Field>
-        <Field label="Client *">
-          <select value={form.client} onChange={set('client')} className={inputCls}>
-            <option value="">— select client —</option>
-            {clients.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
+      <Field label="Client *">
+        <TSelect value={String(form.client ?? '')} onValueChange={changeClient} placeholder="— select client —">
+          <TSelectItem value="">— select client —</TSelectItem>
+          {clients.map((c) => (
+            <TSelectItem key={c.id} value={String(c.id)}>{c.name}</TSelectItem>
+          ))}
+        </TSelect>
+      </Field>
+      {form.client ? (
+        <div className="border border-[#2a2a2a] bg-[#0e0e0e] p-3 flex flex-col gap-2">
+          <span className="font-mono text-[11px] tracking-[0.15em] text-[#a8b09a] uppercase">
+            1 · Deals — check to bundle (any status)
+          </span>
+          {clientDeals.length === 0 ? (
+            <span className="font-mono text-[12px] text-[#a8b09a]">No deals for this client yet.</span>
+          ) : (
+            <ul className="flex flex-col gap-1.5 max-h-44 overflow-y-auto sp-scroll" data-lenis-prevent>
+              {clientDeals.map((d) => {
+                const on = deals.map(String).includes(String(d.id))
+                const billed = billedByDeal[d.id] || []
+                return (
+                  <li key={d.id}>
+                    <label className={`flex items-center gap-3 px-3 py-2 border cursor-pointer transition-colors ${on ? 'border-[#c0f500] bg-[#c0f500]/10' : 'border-[#2a2a2a] hover:border-[#a8b09a]'}`}>
+                      <input
+                        type="checkbox"
+                        checked={on}
+                        onChange={() => toggleDeal(d)}
+                        className="w-4 h-4 accent-[#c0f500]"
+                      />
+                      <span className="flex-1 min-w-0">
+                        <span className="flex items-center gap-2">
+                          <span className="block text-[13px] font-bold truncate">{d.title}</span>
+                          <Badge color={DEAL_STATUS_COLOR[d.status] || 'gray'}>{d.status_display || d.status}</Badge>
+                        </span>
+                        <span className="block font-mono text-[11px] text-[#a8b09a]">
+                          {fmtIDR(d.value_estimate)}
+                          {billed.length > 0 && <span className="text-[#ffd791]"> · BILLED ({billed.join(', ')})</span>}
+                        </span>
+                      </span>
+                    </label>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+        </div>
+      ) : null}
+      <div className="border border-[#2a2a2a] bg-[#0e0e0e] p-3 flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <span className="font-mono text-[11px] tracking-[0.15em] text-[#a8b09a] uppercase">
+            2 · Additional items
+          </span>
+          <button
+            type="button"
+            onClick={addItem}
+            className="font-mono text-[11px] text-[#c0f500] hover:underline font-bold"
+          >
+            + ADD ITEM
+          </button>
+        </div>
+        {items.length === 0 ? (
+          <span className="font-mono text-[12px] text-[#a8b09a]">No extra items — deals total stands alone.</span>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {items.map((it, i) => (
+              <li key={i} className="flex gap-2">
+                <TInput
+                  value={it.description}
+                  onChange={(e) => setItem(i, 'description', e.target.value)}
+                  placeholder="Service name"
+                  className="flex-1 min-w-0"
+                />
+                <TInput
+                  type="number"
+                  min="0"
+                  value={it.amount}
+                  onChange={(e) => setItem(i, 'amount', e.target.value)}
+                  placeholder="Price"
+                  className="w-32 shrink-0"
+                />
+                <button
+                  type="button"
+                  onClick={() => delItem(i)}
+                  aria-label="Remove item"
+                  className="px-2.5 border border-[#353534] text-[#ffb4ab] hover:border-[#ffb4ab] transition-colors shrink-0"
+                >
+                  ✕
+                </button>
+              </li>
             ))}
-          </select>
-        </Field>
+          </ul>
+        )}
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Field label="Amount (Rp) *">
-          <input required type="number" min="0" value={form.amount} onChange={set('amount')} className={inputCls} />
-        </Field>
+      <div className="flex flex-col gap-2">
+        <span className="font-mono text-[11px] tracking-[0.15em] text-[#a8b09a] uppercase">
+          3 · Discount & total
+        </span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Field label={`Discount — ${Number(discount) || 0}%`}>
+            <TSlider
+              min={0}
+              max={100}
+              step={1}
+              value={[Number(discount) || 0]}
+              onValueChange={([n]) => setDiscount(n)}
+              disabled={!auto}
+            />
+          </Field>
+          <Field label={auto ? 'Amount (Rp) — auto' : 'Amount (Rp) — type manually (no lines linked)'}>
+            {auto ? (
+              <TInput value={fmtIDR(finalAmount)} disabled />
+            ) : (
+              <TInput
+                required
+                type="number"
+                min="1"
+                value={form.amount}
+                onChange={set('amount')}
+                placeholder="e.g. DP 50% project X"
+              />
+            )}
+          </Field>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Status">
-          <select value={form.status} onChange={set('status')} className={inputCls}>
+          <TSelect value={form.status} onValueChange={(v) => setForm((f) => ({ ...f, status: v }))} placeholder="Select status">
             {INV_STATUS.map(([v, l]) => (
-              <option key={v} value={v}>{l}</option>
+              <TSelectItem key={v} value={v}>{l}</TSelectItem>
             ))}
-          </select>
+          </TSelect>
         </Field>
         <Field label="Due date">
-          <input type="date" value={form.due_date} onChange={set('due_date')} className={inputCls} />
+          <TInput type="date" value={form.due_date} onChange={set('due_date')} />
         </Field>
       </div>
       <Field label="Notes">
-        <textarea rows={2} value={form.notes} onChange={set('notes')} className={`${inputCls} resize-none`} />
+        <TTextarea rows={2} value={form.notes} onChange={set('notes')} />
       </Field>
-      {error && <ErrorBox message={error} />}
-      <Btn type="submit" disabled={busy}>
-        {busy ? 'SAVING...' : initial?.id ? 'SAVE CHANGES' : '+ ADD INVOICE'}
+      <Btn type="submit">
+        {initial?.id ? 'SAVE CHANGES' : '+ ADD INVOICE'}
       </Btn>
     </form>
   )
 }
 
 export default function Finance() {
+  const { track } = useTasks()
   const [summary, setSummary] = useState(null)
   const [txns, setTxns] = useState([])
   const [invoices, setInvoices] = useState([])
   const [clients, setClients] = useState([])
   const [wonDeals, setWonDeals] = useState([])
+  const [allDeals, setAllDeals] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [kindF, setKindF] = useState('')
   const [txnModal, setTxnModal] = useState(null)
   const [invModal, setInvModal] = useState(null)
   const [confirmDel, setConfirmDel] = useState(null) // {entity, row}
+  const [receipt, setReceipt] = useState(null)
+  const [payInv, setPayInv] = useState(null)
+  const [payReceipt, setPayReceipt] = useState(null)
 
   const load = useCallback(async () => {
     setError('')
     try {
-      const [s, t, i, c, w] = await Promise.all([
+      const [s, t, i, c, w, a] = await Promise.all([
         apiGet('/api/finance/summary/'),
         apiGet('/api/transactions/', { page_size: 100, ordering: '-occurred_on', kind: kindF || undefined }),
         apiGet('/api/invoices/', { page_size: 100, ordering: '-created_at' }),
         apiGet('/api/clients/', { page_size: 200, ordering: 'name' }),
         apiGet('/api/leads/', { status: 'won', page_size: 200, ordering: '-updated_at' }),
+        apiGet('/api/leads/', { page_size: 200, ordering: '-updated_at' }),
       ])
       setSummary(s)
       setTxns(t.results || [])
       setInvoices(i.results || [])
       setClients(c.results || [])
       setWonDeals(w.results || [])
+      setAllDeals(a.results || [])
     } catch (e) {
       setError(e.message)
     } finally {
@@ -355,11 +537,11 @@ export default function Finance() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <h2 className="font-jersey text-3xl uppercase">Transactions</h2>
               <div className="flex gap-2">
-                <select value={kindF} onChange={(e) => setKindF(e.target.value)} className={`${inputCls} !w-auto`}>
-                  <option value="">ALL KINDS</option>
-                  <option value="income">INCOME</option>
-                  <option value="expense">EXPENSE</option>
-                </select>
+                <TSelect value={kindF} onValueChange={(v) => setKindF(v)} placeholder="ALL KINDS" className="w-auto">
+                  <TSelectItem value="">ALL KINDS</TSelectItem>
+                  <TSelectItem value="income">INCOME</TSelectItem>
+                  <TSelectItem value="expense">EXPENSE</TSelectItem>
+                </TSelect>
                 <Btn onClick={() => setTxnModal({ mode: 'add' })}>+ Transaction</Btn>
               </div>
             </div>
@@ -387,6 +569,9 @@ export default function Finance() {
                         <td><span className="font-mono text-[12px] text-[#a8b09a]">{fmtDate(t.occurred_on)}</span></td>
                         <td>
                           <span className="flex gap-2 justify-end">
+                            {t.kind === 'income' && (
+                              <button onClick={() => setPayReceipt(t)} title="View payment receipt" aria-label="View payment receipt" className="font-mono text-[11px] text-[#a8c7fa] hover:underline inline-flex items-center gap-1"><VscEye size={14} /> RECEIPT</button>
+                            )}
                             <button onClick={() => setTxnModal({ mode: 'edit', row: t })} className="font-mono text-[11px] text-[#c0f500] hover:underline">EDIT</button>
                             <button onClick={() => setConfirmDel({ entity: 'transactions', row: t })} className="font-mono text-[11px] text-[#ffb4ab] hover:underline">DELETE</button>
                           </span>
@@ -425,7 +610,9 @@ export default function Finance() {
                         <td><span className="font-mono text-[12px] text-[#a8b09a]">{fmtDate(v.due_date)}</span></td>
                         <td>
                           <span className="flex gap-2 justify-end">
-                            <button onClick={() => setInvModal({ mode: 'edit', row: v })} className="font-mono text-[11px] text-[#c0f500] hover:underline">EDIT</button>
+                            <button onClick={() => setPayInv(v)} className="font-mono text-[11px] text-[#c0f500] hover:underline font-bold">PAY</button>
+                            <button onClick={() => setReceipt(v)} title="View receipt" aria-label="View receipt" className="font-mono text-[11px] text-[#a8c7fa] hover:underline inline-flex items-center gap-1"><VscEye size={14} /> VIEW</button>
+                            <button onClick={() => setInvModal({ mode: 'edit', row: v })} className="font-mono text-[11px] text-[#a8b09a] hover:underline">EDIT</button>
                             <button onClick={() => setConfirmDel({ entity: 'invoices', row: v })} className="font-mono text-[11px] text-[#ffb4ab] hover:underline">DELETE</button>
                           </span>
                         </td>
@@ -444,7 +631,160 @@ export default function Finance() {
       </Modal>
 
       <Modal open={!!invModal} onClose={() => setInvModal(null)} title={invModal?.mode === 'edit' ? `EDIT INVOICE #${invModal?.row?.id}` : 'ADD INVOICE'}>
-        {invModal && <InvoiceForm initial={invModal.mode === 'edit' ? invModal.row : null} clients={clients} onClose={() => setInvModal(null)} onSaved={load} />}
+        {invModal && <InvoiceForm initial={invModal.mode === 'edit' ? invModal.row : null} clients={clients} wonDeals={wonDeals} allDeals={allDeals} invoices={invoices} onClose={() => setInvModal(null)} onSaved={load} />}
+      </Modal>
+
+      <Modal open={!!receipt} onClose={() => setReceipt(null)} title={`RECEIPT // ${receipt?.number || ''}`}>
+        {receipt && (
+          <div className="bg-[#f5f5f0] text-[#161f00] border-2 border-[#161f00]">
+            <div className="flex items-start justify-between gap-4 p-5 border-b-2 border-[#161f00]">
+              <img src={brandLogo} alt="IamFit" className="h-10 w-auto brightness-0" />
+              <div className="text-right">
+                <div className="font-jersey text-4xl uppercase leading-none">Invoice</div>
+                <div className="font-mono text-[12px] font-bold mt-1">{receipt.number}</div>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 p-5 border-b border-[#161f00]/20 font-mono text-[12px]">
+              <div>
+                <div className="text-[10px] tracking-[0.15em] opacity-60">BILLED TO</div>
+                <div className="font-bold">{receipt.client_name || '—'}</div>
+              </div>
+              <div>
+                <div className="text-[10px] tracking-[0.15em] opacity-60">ISSUED</div>
+                <div className="font-bold">{fmtDate(receipt.created_at)}</div>
+              </div>
+              <div>
+                <div className="text-[10px] tracking-[0.15em] opacity-60">DUE</div>
+                <div className="font-bold">{fmtDate(receipt.due_date)}</div>
+              </div>
+            </div>
+            <div className="p-5">
+              <div className="flex justify-between font-mono text-[12px] border-b border-[#161f00]/20 pb-2">
+                <span className="tracking-[0.15em] text-[10px] opacity-60">DESCRIPTION</span>
+                <span className="tracking-[0.15em] text-[10px] opacity-60">AMOUNT</span>
+              </div>
+              {(receipt.deal_lines && receipt.deal_lines.length > 0) || (receipt.items && receipt.items.length > 0) ? (
+                <>
+                  {[
+                    ...(receipt.deal_lines || []).map((d) => ({ desc: d.title, amt: d.value })),
+                    ...(receipt.items || []).map((it) => ({ desc: it.description, amt: it.amount })),
+                  ].map((line, i) => (
+                    <div key={i} className="flex justify-between gap-4 py-2 border-b border-[#161f00]/10">
+                      <span className="text-[13px] font-bold">{line.desc}</span>
+                      <span className="font-mono text-[13px] font-bold whitespace-nowrap">{fmtIDR(line.amt)}</span>
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <div className="flex justify-between gap-4 py-2 border-b border-[#161f00]/10">
+                  <span className="text-[13px] font-bold">{receipt.notes || 'Services rendered'}</span>
+                  <span className="font-mono text-[13px] font-bold whitespace-nowrap">{fmtIDR(receipt.amount)}</span>
+                </div>
+              )}
+              {Number(receipt.discount_percent) > 0 && ((receipt.deal_lines || []).length > 0 || (receipt.items || []).length > 0) && (
+                <div className="flex justify-between gap-4 py-2 border-b border-[#161f00]/10 font-mono text-[13px] font-bold">
+                  <span>DISCOUNT ({receipt.discount_percent}%)</span>
+                  <span className="whitespace-nowrap">−{fmtIDR(
+                    ((receipt.deal_lines || []).reduce((a, d) => a + Number(d.value || 0), 0) +
+                      (receipt.items || []).reduce((a, it) => a + Number(it.amount || 0), 0) || Number(receipt.amount)) - Number(receipt.amount)
+                  )}</span>
+                </div>
+              )}
+              <div className="flex justify-between items-center pt-3">
+                <span className={`inline-block border-2 px-3 py-1 font-mono text-[12px] font-bold uppercase tracking-widest -rotate-2 ${
+                  receipt.status === 'paid'
+                    ? 'border-[#3b7a00] text-[#3b7a00]'
+                    : receipt.status === 'overdue'
+                      ? 'border-[#b3261e] text-[#b3261e]'
+                      : 'border-[#161f00] text-[#161f00]'
+                }`}>
+                  {receipt.status_display || receipt.status}
+                </span>
+                <div className="text-right">
+                  <div className="font-mono text-[10px] tracking-[0.15em] opacity-60">TOTAL DUE</div>
+                  <div className="font-jersey text-4xl leading-none">{fmtIDR(receipt.amount)}</div>
+                </div>
+              </div>
+            </div>
+            <div className="px-5 py-3 bg-[#161f00] text-[#f5f5f0] font-mono text-[11px] flex items-center justify-between">
+              <span>Generated by IamFit Space</span>
+              <span className="text-[#c0f500]">● {receipt.status_display || receipt.status}</span>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      <Modal open={!!payInv} onClose={() => setPayInv(null)} title={`RECORD PAYMENT // ${payInv?.number || ''}`}>
+        {payInv && (
+          <TxnForm
+            initial={{
+              kind: 'income',
+              title: `Payment ${payInv.number}`,
+              category: 'Website Development',
+              amount: payInv.amount,
+              occurred_on: today(),
+              invoice: payInv.id,
+            }}
+            wonDeals={[]}
+            clients={clients}
+            onClose={() => setPayInv(null)}
+            onSaved={async () => {
+              try {
+                await track(apiPatch(`/api/invoices/${payInv.id}/`, { status: 'paid' }), `MARK PAID — ${payInv.number}`)
+              } catch {
+                // invoice update is best-effort; income is already saved
+              }
+              setPayInv(null)
+              load()
+            }}
+          />
+        )}
+      </Modal>
+
+      <Modal open={!!payReceipt} onClose={() => setPayReceipt(null)} title={`PAYMENT RECEIPT // TXN-${payReceipt?.id || ''}`}>
+        {payReceipt && (
+          <div className="bg-[#f5f5f0] text-[#161f00] border-2 border-[#161f00]">
+            <div className="flex items-start justify-between gap-4 p-5 border-b-2 border-[#161f00]">
+              <img src={brandLogo} alt="IamFit" className="h-10 w-auto brightness-0" />
+              <div className="text-right">
+                <div className="font-jersey text-4xl uppercase leading-none">Receipt</div>
+                <div className="font-mono text-[12px] font-bold mt-1">TXN-{payReceipt.id}</div>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 p-5 border-b border-[#161f00]/20 font-mono text-[12px]">
+              <div>
+                <div className="text-[10px] tracking-[0.15em] opacity-60">RECEIVED</div>
+                <div className="font-bold font-jersey text-3xl">{fmtIDR(payReceipt.amount)}</div>
+              </div>
+              <div>
+                <div className="text-[10px] tracking-[0.15em] opacity-60">DATE</div>
+                <div className="font-bold">{fmtDate(payReceipt.occurred_on)}</div>
+              </div>
+            </div>
+            <div className="p-5">
+              <div className="flex justify-between font-mono text-[12px] border-b border-[#161f00]/20 pb-2">
+                <span className="tracking-[0.15em] text-[10px] opacity-60">FOR</span>
+                <span className="tracking-[0.15em] text-[10px] opacity-60">REF</span>
+              </div>
+              <div className="flex justify-between gap-4 py-3 border-b border-[#161f00]/20">
+                <span className="text-[13px] font-bold">{payReceipt.title || payReceipt.category}</span>
+                <span className="font-mono text-[13px] font-bold whitespace-nowrap">
+                  {payReceipt.invoice_number || payReceipt.lead_title || '—'}
+                </span>
+              </div>
+              <div className="flex justify-between items-center pt-3">
+                <span className="inline-block border-2 px-3 py-1 font-mono text-[12px] font-bold uppercase tracking-widest -rotate-2 border-[#3b7a00] text-[#3b7a00]">
+                  Settled
+                </span>
+                <div className="font-mono text-[10px] tracking-[0.15em] opacity-60 text-right">IAMFIT SPACE<br />THANK YOU</div>
+              </div>
+            </div>
+            <div className="px-5 py-3 bg-[#161f00] text-[#f5f5f0] font-mono text-[11px] flex items-center justify-between">
+              <span>Generated by IamFit Space</span>
+              <span className="text-[#c0f500]">● payment received</span>
+            </div>
+          </div>
+        )}
       </Modal>
 
       <Modal open={!!confirmDel} onClose={() => setConfirmDel(null)} title={`DELETE ${confirmDel?.entity === 'invoices' ? 'INVOICE' : 'TRANSACTION'}?`}>
@@ -455,7 +795,7 @@ export default function Finance() {
             </p>
             <div className="flex gap-2 justify-end">
               <Btn variant="secondary" onClick={() => setConfirmDel(null)}>CANCEL</Btn>
-              <Btn variant="primary" onClick={queueDel} className="!bg-[#ffb4ab] !border-[#ffb4ab] !text-[#161f00]">YES, DELETE</Btn>
+              <Btn variant="destructive" onClick={queueDel}>YES, DELETE</Btn>
             </div>
           </div>
         )}

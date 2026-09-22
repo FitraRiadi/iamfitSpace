@@ -86,6 +86,7 @@ export async function flushQueue(entity, deleteFn, keepalive = false) {
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { apiDelete } from './api'
+import { useTasks } from './tasks'
 
 // One hook per entity per page. Handles: optimistic queue, manual sync,
 // auto-flush on mount (pending from last session), on unmount (page leave),
@@ -95,6 +96,7 @@ export function useDeleteQueue(entity, load) {
   const [queued, setQueued] = useState(() => getQueue(entity))
   const [failed, setFailed] = useState([])
   const [syncing, setSyncing] = useState(false)
+  const tasksApi = useTasks()
   const mountedRef = useRef(true)
   useEffect(() => {
     mountedRef.current = true
@@ -103,17 +105,46 @@ export function useDeleteQueue(entity, load) {
     }
   }, [])
 
+  // Stable refs: progress ticks recreate context value — flush effects
+  // must NOT resubscribe on every tick (would double-flush).
+  const tasksRef = useRef(null)
+  tasksRef.current = tasksApi
+  const loadRef = useRef(null)
+  loadRef.current = load
+
   const doFlush = useCallback(
     async (keepalive) => {
-      const res = await flushQueue(entity, (id, o) => apiDelete(`/api/${entity}/${id}/`, o), keepalive)
+      const pending = getQueue(entity)
+      if (!pending.length) return { ok: 0, failed: [] }
+      const api = tasksRef.current
+      const label = `SYNC DELETE — ${entity.toUpperCase()} (${pending.length})`
+      const tid = api.push(label, 'running')
+      api.set(tid, { progress: 0 })
+      let done = 0
+      const res = await flushQueue(
+        entity,
+        async (id, o) => {
+          try {
+            await apiDelete(`/api/${entity}/${id}/`, o)
+          } finally {
+            done++
+            api.set(tid, { progress: done / pending.length })
+          }
+        },
+        keepalive
+      )
+      api.set(tid, {
+        status: res.failed.length ? 'failed' : 'done',
+        progress: 1,
+      })
       if (mountedRef.current) {
         setFailed(res.failed)
         setQueued(getQueue(entity))
-        await load()
+        await loadRef.current()
       }
       return res
     },
-    [entity, load]
+    [entity]
   )
 
   const syncNow = useCallback(async () => {

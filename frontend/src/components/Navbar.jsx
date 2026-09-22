@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import brandMark from '../assets/brand-mark.svg'
+import brandMark from '../assets/iamfit-brand.png'
 import { EASE } from '../lib/anim'
 import { scrollToSection } from '../lib/lenis.js'
 import { useAuth } from '../lib/auth'

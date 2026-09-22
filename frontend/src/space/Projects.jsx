@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { apiGet, apiPost, apiPatch } from '../lib/api'
 import { useDeleteQueue } from '../lib/deleteQueue'
-import { PageHead, Btn, Modal, Field, inputCls, Empty, ErrorBox, SpinnerCircle, Badge, PendingBar, FailedBox, fmtIDR, fmtDate } from './ui'
+import { useTasks } from '../lib/tasks'
+import { PageHead, Btn, Modal, Field, TInput, TTextarea, TSelect, TSelectItem, TSlider, Empty, ErrorBox, SpinnerCircle, Badge, PendingBar, FailedBox, fmtIDR, fmtDate } from './ui'
 
 const STATUS_OPTS = [
   ['planning', 'PLANNING'],
@@ -24,6 +25,7 @@ const emptyForm = {
 }
 
 function ProjectForm({ initial, clients, onClose, onSaved }) {
+  const { track } = useTasks()
   const [form, setForm] = useState(() => ({
     ...emptyForm,
     ...(initial || {}),
@@ -31,15 +33,10 @@ function ProjectForm({ initial, clients, onClose, onSaved }) {
     deadline: initial?.deadline || '',
     contract_value: initial?.contract_value ?? '',
   }))
-  const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
 
   const submit = async (e) => {
     e.preventDefault()
-    if (busy) return
-    setBusy(true)
-    setError('')
     const payload = {
       ...form,
       client: form.client || null,
@@ -47,75 +44,82 @@ function ProjectForm({ initial, clients, onClose, onSaved }) {
       contract_value: form.contract_value === '' ? 0 : form.contract_value,
       progress: Number(form.progress) || 0,
     }
+    onClose()
     try {
-      if (initial?.id) await apiPatch(`/api/projects/${initial.id}/`, payload)
-      else await apiPost('/api/projects/', payload)
+      if (initial?.id) await track(apiPatch(`/api/projects/${initial.id}/`, payload), `UPDATE PROJECT — ${form.name}`)
+      else await track(apiPost('/api/projects/', payload), `CREATE PROJECT — ${form.name}`)
       onSaved()
-      onClose()
-    } catch (err) {
-      setError(err.data?.name?.[0] || err.data?.progress?.[0] || err.message)
-    } finally {
-      setBusy(false)
+    } catch {
+      // failed task stays visible in the stack for retry/dismiss
     }
   }
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
       <Field label="Project name *">
-        <input required value={form.name} onChange={set('name')} className={inputCls} />
+        <TInput required value={form.name} onChange={set('name')} />
       </Field>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Field label="Branch">
-          <select value={form.branch} onChange={set('branch')} className={inputCls}>
+          <TSelect value={form.branch} onValueChange={(v) => setForm((f) => ({ ...f, branch: v }))} placeholder="Select branch">
             {BRANCH_OPTS.map(([v, l]) => (
-              <option key={v} value={v}>{l}</option>
+              <TSelectItem key={v} value={v}>{l}</TSelectItem>
             ))}
-          </select>
+          </TSelect>
         </Field>
         <Field label="Status">
-          <select value={form.status} onChange={set('status')} className={inputCls}>
+          <TSelect value={form.status} onValueChange={(v) => setForm((f) => ({ ...f, status: v }))} placeholder="Select status">
             {STATUS_OPTS.map(([v, l]) => (
-              <option key={v} value={v}>{l}</option>
+              <TSelectItem key={v} value={v}>{l}</TSelectItem>
             ))}
-          </select>
+          </TSelect>
         </Field>
         <Field label="Client">
-          <select value={form.client} onChange={set('client')} className={inputCls}>
-            <option value="">— no client —</option>
+          <TSelect
+            value={String(form.client ?? '')}
+            onValueChange={(v) => setForm((f) => ({ ...f, client: v === '' ? '' : Number(v) }))}
+            placeholder="— no client —"
+          >
+            <TSelectItem value="">— no client —</TSelectItem>
             {clients.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
+              <TSelectItem key={c.id} value={String(c.id)}>{c.name}</TSelectItem>
             ))}
-          </select>
+          </TSelect>
         </Field>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Field label="Deadline">
-          <input type="date" value={form.deadline} onChange={set('deadline')} className={inputCls} />
+          <TInput type="date" value={form.deadline} onChange={set('deadline')} />
         </Field>
         <Field label="Contract value (Rp)">
-          <input type="number" min="0" value={form.contract_value} onChange={set('contract_value')} className={inputCls} />
+          <TInput type="number" min="0" value={form.contract_value} onChange={set('contract_value')} />
         </Field>
         <Field label={`Progress — ${form.progress}%`}>
-          <input type="range" min="0" max="100" value={form.progress} onChange={set('progress')} className="w-full accent-[#c0f500]" />
+          <TSlider
+            min={0}
+            max={100}
+            step={1}
+            value={[Number(form.progress) || 0]}
+            onValueChange={([n]) => setForm((f) => ({ ...f, progress: n }))}
+          />
         </Field>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Demo URL">
-          <input value={form.demo_url} onChange={set('demo_url')} className={inputCls} placeholder="https://" />
+          <TInput value={form.demo_url} onChange={set('demo_url')} placeholder="https://" />
         </Field>
         <Field label="Repo URL">
-          <input value={form.repo_url} onChange={set('repo_url')} className={inputCls} placeholder="https://" />
+          <TInput value={form.repo_url} onChange={set('repo_url')} placeholder="https://" />
         </Field>
       </div>
       <Field label="Description">
-        <textarea rows={2} value={form.description} onChange={set('description')} className={`${inputCls} resize-none`} />
+        <TTextarea rows={2} value={form.description} onChange={set('description')} />
       </Field>
       <Field label="Notes">
-        <textarea rows={2} value={form.notes} onChange={set('notes')} className={`${inputCls} resize-none`} />
+        <TTextarea rows={2} value={form.notes} onChange={set('notes')} />
       </Field>
-      {error && <ErrorBox message={error} />}
-      <Btn type="submit" disabled={busy}>
-        {busy ? 'SAVING...' : initial?.id ? 'SAVE CHANGES' : '+ ADD PROJECT'}
+      <Btn type="submit">
+        {initial?.id ? 'SAVE CHANGES' : '+ ADD PROJECT'}
       </Btn>
     </form>
   )
@@ -175,12 +179,12 @@ export default function Projects() {
       />
 
       <div className="flex flex-wrap items-center gap-2">
-        <select value={statusF} onChange={(e) => setStatusF(e.target.value)} className={`${inputCls} !w-auto`}>
-          <option value="">ALL STATUSES</option>
+        <TSelect value={statusF} onValueChange={(v) => setStatusF(v)} placeholder="ALL STATUSES" className="w-auto">
+          <TSelectItem value="">ALL STATUSES</TSelectItem>
           {STATUS_OPTS.map(([v, l]) => (
-            <option key={v} value={v}>{l}</option>
+            <TSelectItem key={v} value={v}>{l}</TSelectItem>
           ))}
-        </select>
+        </TSelect>
         <Badge color="lime">{fmtIDR(activeValue)} ACTIVE VALUE</Badge>
         <Badge color="gray">{visibleRows.length} PROJECTS</Badge>
       </div>
@@ -259,7 +263,7 @@ export default function Projects() {
             </p>
             <div className="flex gap-2 justify-end">
               <Btn variant="secondary" onClick={() => setConfirmDel(null)}>CANCEL</Btn>
-              <Btn variant="primary" onClick={queueDel} className="!bg-[#ffb4ab] !border-[#ffb4ab] !text-[#161f00]">YES, DELETE</Btn>
+              <Btn variant="destructive" onClick={queueDel}>YES, DELETE</Btn>
             </div>
           </div>
         )}

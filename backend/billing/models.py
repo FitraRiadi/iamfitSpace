@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 
@@ -26,10 +27,19 @@ class Invoice(models.Model):
         related_name='invoices',
     )
     number = models.CharField(max_length=50)
-    amount = models.DecimalField(max_digits=14, decimal_places=2)
+    amount = models.DecimalField(max_digits=14, decimal_places=2, validators=[MinValueValidator(1)])
+    discount_percent = models.PositiveSmallIntegerField(
+        default=0, validators=[MinValueValidator(0), MaxValueValidator(100)]
+    )
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.DRAFT)
     due_date = models.DateField(null=True, blank=True)
     notes = models.TextField(blank=True)
+    # Deals billed on this invoice (many-to-many: one invoice can bundle
+    # several won deals; one deal can be billed across several invoices,
+    # e.g. DP + pelunasan). Powers receipt lines + double-billing hints.
+    leads = models.ManyToManyField(
+        'crm.Lead', blank=True, related_name='invoices'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -88,3 +98,20 @@ class Transaction(models.Model):
 
     def __str__(self):
         return f'{self.get_kind_display()} {self.amount} ({self.title or self.category})'
+
+
+class InvoiceItem(models.Model):
+    """Manual line on an invoice: extra services/fees beside linked deals."""
+
+    invoice = models.ForeignKey(
+        Invoice, on_delete=models.CASCADE, related_name='items'
+    )
+    description = models.CharField(max_length=200)
+    amount = models.DecimalField(max_digits=14, decimal_places=2, validators=[MinValueValidator(1)])
+    position = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ['position', 'id']
+
+    def __str__(self):
+        return f'{self.description} — {self.amount}'

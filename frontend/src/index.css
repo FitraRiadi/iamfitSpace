@@ -10,6 +10,10 @@ html, body {
   background: #131313;
   color: #e5e2e1;
   overscroll-behavior: none;
+  /* Cadangkan ruang scrollbar permanen: overlay Radix (Select dropdown, dsb)
+     ngunci scroll body + nambah padding kompensasi tiap dibuka — tanpa gutter
+     stabil itu bikin layout in-flow (sidebar/topbar sticky) kegeser sementara. */
+  scrollbar-gutter: stable;
   /* Guard: cegah horizontal overflow bocor ke body (ruang kosong kanan di mobile).
      Pakai clip (bukan hidden) biar position: sticky navbar tetap jalan. */
   max-width: 100%;
@@ -20,6 +24,22 @@ html, body {
   html, body {
     overflow-x: hidden;
   }
+}
+
+/* Radix overlay (Select dropdown) scroll-lock guard.
+   Radix nyuntik `overflow: hidden !important` ke body tiap dropdown dibuka.
+   Itu bikin body jadi scroll-container dadakan -> `position: sticky`
+   (sidebar/topbar dashboard) patah dan mental ke posisi natural (ketarik ke atas).
+   `clip` ngunci scroll TANPA bikin scroll-container, jadi sticky tetap jalan.
+   Specificity sengaja dibuat lebih tinggi dari style injeksi Radix. */
+html.with-scroll-bars-hidden {
+  padding-right: 0 !important;
+}
+html body[data-scroll-locked] {
+  overflow: clip !important;
+  overflow-x: clip !important;
+  padding-right: 0 !important;
+  margin-right: 0 !important;
 }
 
 #root {

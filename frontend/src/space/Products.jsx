@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { apiGet, apiPost, apiPatch } from '../lib/api'
 import { useDeleteQueue } from '../lib/deleteQueue'
-import { PageHead, Btn, Modal, Field, inputCls, Empty, ErrorBox, SpinnerCircle, Badge, PendingBar, FailedBox, fmtIDR } from './ui'
+import { useTasks } from '../lib/tasks'
+import { PageHead, Btn, Modal, Field, TInput, TTextarea, TSelect, TSelectItem, Empty, ErrorBox, SpinnerCircle, Badge, PendingBar, FailedBox, fmtIDR } from './ui'
 
 const STATUS_OPTS = [['draft', 'DRAFT'], ['published', 'PUBLISHED'], ['archived', 'ARCHIVED']]
 const statusColor = { draft: 'gray', published: 'lime', archived: 'gray' }
@@ -9,6 +10,7 @@ const slugify = (s) =>
   s.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60)
 
 function ProductForm({ initial, categories, onClose, onSaved }) {
+  const { track } = useTasks()
   const [form, setForm] = useState(() => ({
     name: initial?.name || '',
     slug: initial?.slug || '',
@@ -20,8 +22,6 @@ function ProductForm({ initial, categories, onClose, onSaved }) {
     version: initial?.version || '',
   }))
   const [slugTouched, setSlugTouched] = useState(!!initial)
-  const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
   const set = (k) => (e) => {
     const v = e.target.value
     setForm((f) => {
@@ -33,19 +33,14 @@ function ProductForm({ initial, categories, onClose, onSaved }) {
 
   const submit = async (e) => {
     e.preventDefault()
-    if (busy) return
-    setBusy(true)
-    setError('')
     const payload = { ...form, category: form.category || null, price: form.price === '' ? 0 : form.price }
+    onClose()
     try {
-      if (initial?.id) await apiPatch(`/api/products/${initial.id}/`, payload)
-      else await apiPost('/api/products/', payload)
+      if (initial?.id) await track(apiPatch(`/api/products/${initial.id}/`, payload), `UPDATE PRODUCT — ${form.name}`)
+      else await track(apiPost('/api/products/', payload), `CREATE PRODUCT — ${form.name}`)
       onSaved()
-      onClose()
-    } catch (err) {
-      setError(err.data?.slug?.[0] || err.data?.name?.[0] || err.message)
-    } finally {
-      setBusy(false)
+    } catch {
+      // failed task stays visible in the stack for retry/dismiss
     }
   }
 
@@ -53,54 +48,56 @@ function ProductForm({ initial, categories, onClose, onSaved }) {
     <form onSubmit={submit} className="flex flex-col gap-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Product name *">
-          <input required value={form.name} onChange={set('name')} className={inputCls} />
+          <TInput required value={form.name} onChange={set('name')} />
         </Field>
         <Field label="Slug *">
-          <input
+          <TInput
             required
             value={form.slug}
             onChange={(e) => {
               setSlugTouched(true)
               set('slug')(e)
             }}
-            className={inputCls}
           />
         </Field>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Field label="Category">
-          <select value={form.category} onChange={set('category')} className={inputCls}>
-            <option value="">— no category —</option>
+          <TSelect
+            value={String(form.category ?? '')}
+            onValueChange={(v) => setForm((f) => ({ ...f, category: v === '' ? '' : Number(v) }))}
+            placeholder="— no category —"
+          >
+            <TSelectItem value="">— no category —</TSelectItem>
             {categories.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
+              <TSelectItem key={c.id} value={String(c.id)}>{c.name}</TSelectItem>
             ))}
-          </select>
+          </TSelect>
         </Field>
         <Field label="Price (Rp)">
-          <input type="number" min="0" value={form.price} onChange={set('price')} className={inputCls} />
+          <TInput type="number" min="0" value={form.price} onChange={set('price')} />
         </Field>
         <Field label="Status">
-          <select value={form.status} onChange={set('status')} className={inputCls}>
+          <TSelect value={form.status} onValueChange={(v) => setForm((f) => ({ ...f, status: v }))} placeholder="Select status">
             {STATUS_OPTS.map(([v, l]) => (
-              <option key={v} value={v}>{l}</option>
+              <TSelectItem key={v} value={v}>{l}</TSelectItem>
             ))}
-          </select>
+          </TSelect>
         </Field>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Demo URL">
-          <input value={form.demo_url} onChange={set('demo_url')} className={inputCls} placeholder="https://" />
+          <TInput value={form.demo_url} onChange={set('demo_url')} placeholder="https://" />
         </Field>
         <Field label="Version">
-          <input value={form.version} onChange={set('version')} className={inputCls} placeholder="1.0.0" />
+          <TInput value={form.version} onChange={set('version')} placeholder="1.0.0" />
         </Field>
       </div>
       <Field label="Short description">
-        <textarea rows={2} value={form.short_description} onChange={set('short_description')} className={`${inputCls} resize-none`} />
+        <TTextarea rows={2} value={form.short_description} onChange={set('short_description')} />
       </Field>
-      {error && <ErrorBox message={error} />}
-      <Btn type="submit" disabled={busy}>
-        {busy ? 'SAVING...' : initial?.id ? 'SAVE CHANGES' : '+ ADD PRODUCT'}
+      <Btn type="submit">
+        {initial?.id ? 'SAVE CHANGES' : '+ ADD PRODUCT'}
       </Btn>
     </form>
   )
@@ -156,12 +153,12 @@ export default function Products() {
       />
 
       <div className="flex flex-wrap items-center gap-2">
-        <select value={statusF} onChange={(e) => setStatusF(e.target.value)} className={`${inputCls} !w-auto`}>
-          <option value="">ALL STATUSES</option>
+        <TSelect value={statusF} onValueChange={(v) => setStatusF(v)} placeholder="ALL STATUSES" className="w-auto">
+          <TSelectItem value="">ALL STATUSES</TSelectItem>
           {STATUS_OPTS.map(([v, l]) => (
-            <option key={v} value={v}>{l}</option>
+            <TSelectItem key={v} value={v}>{l}</TSelectItem>
           ))}
-        </select>
+        </TSelect>
         <Badge color="gray">{visibleRows.length} PRODUCTS</Badge>
       </div>
 
@@ -223,7 +220,7 @@ export default function Products() {
             </p>
             <div className="flex gap-2 justify-end">
               <Btn variant="secondary" onClick={() => setConfirmDel(null)}>CANCEL</Btn>
-              <Btn variant="primary" onClick={queueDel} className="!bg-[#ffb4ab] !border-[#ffb4ab] !text-[#161f00]">YES, DELETE</Btn>
+              <Btn variant="destructive" onClick={queueDel}>YES, DELETE</Btn>
             </div>
           </div>
         )}

@@ -7,7 +7,8 @@ import {
 } from '@tanstack/react-table'
 import { apiGet, apiPost, apiPatch, apiDelete } from '../lib/api'
 import { useDeleteQueue, enqueueDelete, flushQueue } from '../lib/deleteQueue'
-import { PageHead, Btn, Modal, Field, inputCls, Empty, ErrorBox, SpinnerCircle, Badge, PendingBar, FailedBox, fmtDate } from './ui'
+import { useTasks } from '../lib/tasks'
+import { PageHead, Btn, Modal, Field, TInput, TTextarea, Empty, ErrorBox, SpinnerCircle, Badge, PendingBar, FailedBox, fmtDate } from './ui'
 
 const columnHelper = createColumnHelper()
 const PAGE_SIZE = 10
@@ -15,53 +16,44 @@ const PAGE_SIZE = 10
 const emptyForm = { name: '', company: '', contact: '', email: '', notes: '' }
 
 function ClientForm({ initial, onClose, onSaved }) {
+  const { track } = useTasks()
   const [form, setForm] = useState(initial || emptyForm)
-  const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
 
+  // Optimistic close: popup shuts instantly, result lands in the activity stack.
   const submit = async (e) => {
     e.preventDefault()
-    if (busy) return
-    setBusy(true)
-    setError('')
+    onClose()
     try {
-      if (initial?.id) await apiPatch(`/api/clients/${initial.id}/`, form)
-      else await apiPost('/api/clients/', form)
+      if (initial?.id) await track(apiPatch(`/api/clients/${initial.id}/`, form), `UPDATE CLIENT — ${form.name}`)
+      else await track(apiPost('/api/clients/', form), `CREATE CLIENT — ${form.name}`)
       onSaved()
-      onClose()
-    } catch (err) {
-      const d = err.data
-      const msg =
-        (d && typeof d === 'object' && (d.name?.[0] || d.email?.[0] || d.detail)) || err.message
-      setError(msg)
-    } finally {
-      setBusy(false)
+    } catch {
+      // failed task stays visible in the stack for retry/dismiss
     }
   }
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
       <Field label="Name *">
-        <input required value={form.name} onChange={set('name')} className={inputCls} placeholder="Client / PIC name" />
+        <TInput required value={form.name} onChange={set('name')} placeholder="Client / PIC name" />
       </Field>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Company / Org">
-          <input value={form.company} onChange={set('company')} className={inputCls} />
+          <TInput value={form.company} onChange={set('company')} />
         </Field>
         <Field label="Contact">
-          <input value={form.contact} onChange={set('contact')} className={inputCls} placeholder="WA / @username" />
+          <TInput value={form.contact} onChange={set('contact')} placeholder="WA / @username" />
         </Field>
       </div>
       <Field label="Email">
-        <input type="email" value={form.email} onChange={set('email')} className={inputCls} />
+        <TInput type="email" value={form.email} onChange={set('email')} />
       </Field>
       <Field label="Notes">
-        <textarea rows={3} value={form.notes} onChange={set('notes')} className={`${inputCls} resize-none`} />
+        <TTextarea rows={3} value={form.notes} onChange={set('notes')} />
       </Field>
-      {error && <ErrorBox message={error} />}
-      <Btn type="submit" disabled={busy}>
-        {busy ? 'SAVING...' : initial?.id ? 'SAVE CHANGES' : '+ ADD CLIENT'}
+      <Btn type="submit">
+        {initial?.id ? 'SAVE CHANGES' : '+ ADD CLIENT'}
       </Btn>
     </form>
   )
@@ -223,11 +215,11 @@ export default function Clients() {
       />
 
       <div className="flex flex-col sm:flex-row gap-3">
-        <input
+        <TInput
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search name / company / email..."
-          className={`${inputCls} sm:max-w-sm`}
+          className="sm:max-w-sm"
         />
       </div>
 
@@ -328,7 +320,7 @@ export default function Clients() {
               <Btn variant="secondary" onClick={() => setConfirmDel(null)}>
                 CANCEL
               </Btn>
-              <Btn variant="primary" onClick={queueDel} className="!bg-[#ffb4ab] !border-[#ffb4ab] !text-[#161f00]">
+              <Btn variant="destructive" onClick={queueDel}>
                 YES, DELETE
               </Btn>
             </div>

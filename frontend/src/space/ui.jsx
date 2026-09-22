@@ -1,5 +1,19 @@
 import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Button as TremorButton } from './tremor/Button'
+import { Input as TremorInput, Textarea as TremorTextarea } from './tremor/Input'
+import {
+  Select as TremorSelect,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem as TremorItem,
+} from './tremor/Select'
+import { Slider as TremorSlider } from './tremor/Slider'
+import {
+  RadioGroup as TremorRadio,
+  RadioGroupItem as TremorRadioItem,
+} from './tremor/RadioGroup'
 
 export function Spinner({ label = 'LOADING...' }) {
   return (
@@ -45,23 +59,57 @@ export function PageHead({ title, desc, actions }) {
   )
 }
 
-export function Btn({ children, onClick, type = 'button', variant = 'primary', className = '', disabled }) {
-  const styles =
-    variant === 'primary'
-      ? 'bg-[#c0f500] text-[#161f00] border-[#c0f500] hover:bg-[#d4ff4d] font-bold'
-      : variant === 'ghost'
-        ? 'bg-transparent text-[#a8b09a] border-[#353534] hover:text-[#e5e2e1] hover:border-[#a8b09a]'
-        : 'bg-[#201f1f] text-[#e5e2e1] border-[#353534] hover:border-[#c0f500] hover:text-[#c0f500]'
+export function Btn({ children, onClick, type = 'button', variant = 'primary', className = '', disabled, isLoading }) {
   return (
-    <button
+    <TremorButton
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex items-center justify-center gap-2 px-4 py-2.5 border font-mono text-[12px] tracking-wider uppercase transition-colors disabled:opacity-50 ${styles} ${className}`}
+      isLoading={isLoading}
+      variant={variant}
+      className={`font-mono text-[12px] tracking-wider uppercase px-4 py-2.5 ${className}`}
     >
       {children}
-    </button>
+    </TremorButton>
   )
+}
+
+// ---- Tremor-backed primitives (dark neobrutal theme baked in) ----
+// Same look everywhere: 1px flat borders, radius 0, lime focus.
+
+export function TInput(props) {
+  return <TremorInput {...props} />
+}
+
+export function TTextarea(props) {
+  return <TremorTextarea {...props} />
+}
+
+export function TSlider(props) {
+  return <TremorSlider {...props} />
+}
+
+export function TRadio(props) {
+  return <TremorRadio {...props} />
+}
+
+export function TRadioItem(props) {
+  return <TremorRadioItem {...props} />
+}
+
+export function TSelect({ value, onValueChange, placeholder, children, className, required, disabled }) {
+  return (
+    <TremorSelect value={value ?? ''} onValueChange={onValueChange} required={required} disabled={disabled}>
+      <SelectTrigger className={className}>
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent>{children}</SelectContent>
+    </TremorSelect>
+  )
+}
+
+export function TSelectItem(props) {
+  return <TremorItem {...props} />
 }
 
 export function Field({ label, children, hint }) {

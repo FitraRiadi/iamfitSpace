@@ -1,6 +1,11 @@
 from django.contrib import admin
 
-from .models import Invoice, Transaction
+from .models import Invoice, InvoiceItem, Transaction
+
+
+class InvoiceItemInline(admin.TabularInline):
+    model = InvoiceItem
+    extra = 0
 
 
 @admin.register(Invoice)
@@ -9,6 +14,7 @@ class InvoiceAdmin(admin.ModelAdmin):
     list_filter = ('status', 'owner')
     search_fields = ('number', 'notes', 'client__name')
     autocomplete_fields = ('client', 'project')
+    inlines = [InvoiceItemInline]
 
 
 @admin.register(Transaction)

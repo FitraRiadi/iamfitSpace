@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { apiGet, apiPost, apiPatch } from '../lib/api'
 import { useDeleteQueue } from '../lib/deleteQueue'
-import { PageHead, Btn, Modal, Field, inputCls, ErrorBox, SpinnerCircle, Badge, PendingBar, FailedBox, fmtIDR, fmtDate } from './ui'
+import { useTasks } from '../lib/tasks'
+import { PageHead, Btn, Modal, Field, TInput, TTextarea, TSelect, TSelectItem, ErrorBox, SpinnerCircle, Badge, PendingBar, FailedBox, fmtIDR, fmtDate } from './ui'
 
 const STATUSES = [
   { value: 'new', label: 'NEW LEAD', color: 'gray' },
@@ -24,6 +25,7 @@ const emptyForm = {
 }
 
 function LeadForm({ initial, clients, onClose, onSaved }) {
+  const { track } = useTasks()
   const [form, setForm] = useState(() => ({
     ...emptyForm,
     ...(initial || {}),
@@ -32,8 +34,6 @@ function LeadForm({ initial, clients, onClose, onSaved }) {
     follow_up_date: initial?.follow_up_date || '',
   }))
   const [logs, setLogs] = useState([])
-  const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
 
   useEffect(() => {
@@ -51,72 +51,74 @@ function LeadForm({ initial, clients, onClose, onSaved }) {
 
   const submit = async (e) => {
     e.preventDefault()
-    if (busy) return
-    setBusy(true)
-    setError('')
     const payload = {
       ...form,
       client: form.client || null,
       value_estimate: form.value_estimate === '' ? 0 : form.value_estimate,
       follow_up_date: form.follow_up_date || null,
     }
+    onClose()
     try {
-      if (initial?.id) await apiPatch(`/api/leads/${initial.id}/`, payload)
-      else await apiPost('/api/leads/', payload)
+      if (initial?.id) await track(apiPatch(`/api/leads/${initial.id}/`, payload), `UPDATE LEAD — ${form.title}`)
+      else await track(apiPost('/api/leads/', payload), `CREATE LEAD — ${form.title}`)
       onSaved()
-      onClose()
-    } catch (err) {
-      setError(err.data?.title?.[0] || err.message)
-    } finally {
-      setBusy(false)
+    } catch {
+      // failed task stays visible in the stack for retry/dismiss
     }
   }
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
       <Field label="Lead title *">
-        <input required value={form.title} onChange={set('title')} className={inputCls} placeholder="e.g. Company profile + CMS" />
+        <TInput required value={form.title} onChange={set('title')} placeholder="e.g. Company profile + CMS" />
       </Field>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Contact">
-          <input value={form.contact} onChange={set('contact')} className={inputCls} />
+          <TInput value={form.contact} onChange={set('contact')} />
         </Field>
         <Field label="Linked client">
-          <select value={form.client} onChange={set('client')} className={inputCls}>
-            <option value="">— no client —</option>
+          <TSelect
+            value={String(form.client ?? '')}
+            onValueChange={(v) => setForm((f) => ({ ...f, client: v === '' ? '' : Number(v) }))}
+            placeholder="— no client —"
+          >
+            <TSelectItem value="">— no client —</TSelectItem>
             {clients.map((c) => (
-              <option key={c.id} value={c.id}>
+              <TSelectItem key={c.id} value={String(c.id)}>
                 {c.name}
-              </option>
+              </TSelectItem>
             ))}
-          </select>
+          </TSelect>
         </Field>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Estimated value (Rp)">
-          <input
+          <TInput
             type="number"
             min="0"
             value={form.value_estimate}
             onChange={set('value_estimate')}
-            className={inputCls}
           />
         </Field>
         <Field label="Follow-up">
-          <input type="date" value={form.follow_up_date} onChange={set('follow_up_date')} className={inputCls} />
+          <TInput type="date" value={form.follow_up_date} onChange={set('follow_up_date')} />
         </Field>
       </div>
       <Field label="Status">
-        <select value={form.status} onChange={set('status')} className={inputCls}>
+        <TSelect
+          value={form.status}
+          onValueChange={(v) => setForm((f) => ({ ...f, status: v }))}
+          placeholder="Select status"
+        >
           {STATUSES.map((s) => (
-            <option key={s.value} value={s.value}>
+            <TSelectItem key={s.value} value={s.value}>
               {s.label}
-            </option>
+            </TSelectItem>
           ))}
-        </select>
+        </TSelect>
       </Field>
       <Field label="Notes">
-        <textarea rows={3} value={form.notes} onChange={set('notes')} className={`${inputCls} resize-none`} />
+        <TTextarea rows={3} value={form.notes} onChange={set('notes')} />
       </Field>
       {logs.length > 0 && (
         <div className="border border-[#2a2a2a] bg-[#0e0e0e] px-3 py-2">
@@ -130,9 +132,8 @@ function LeadForm({ initial, clients, onClose, onSaved }) {
           </ul>
         </div>
       )}
-      {error && <ErrorBox message={error} />}
-      <Btn type="submit" disabled={busy}>
-        {busy ? 'SAVING...' : initial?.id ? 'SAVE CHANGES' : '+ ADD LEAD'}
+      <Btn type="submit">
+        {initial?.id ? 'SAVE CHANGES' : '+ ADD LEAD'}
       </Btn>
     </form>
   )
@@ -341,7 +342,7 @@ export default function Leads() {
               <Btn variant="secondary" onClick={() => setConfirmDel(null)}>
                 CANCEL
               </Btn>
-              <Btn variant="primary" onClick={queueDel} className="!bg-[#ffb4ab] !border-[#ffb4ab] !text-[#161f00]">
+              <Btn variant="destructive" onClick={queueDel}>
                 YES, DELETE
               </Btn>
             </div>

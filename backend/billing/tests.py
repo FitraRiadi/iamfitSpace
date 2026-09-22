@@ -110,7 +110,7 @@ class MonthlyFinanceTests(APITestCase):
         inv = Invoice.objects.get(pk=inv_id)
         today = date.today()
         self.assertEqual(inv.number, f'INV-{today:%Y/%m/%d}-{inv.id}')
-        self.assertEqual(inv.status, 'draft')
+        self.assertEqual(inv.status, 'paid')
         self.assertEqual(inv.client_id, client.pk)
         self.assertEqual(res.data['invoice_number'], inv.number)
 
@@ -128,3 +128,112 @@ class MonthlyFinanceTests(APITestCase):
             format='json',
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invoice_links_multiple_deals(self):
+        from crm.models import Client, Lead
+
+        client = Client.objects.create(owner=self.user, name='Acme')
+        l1 = Lead.objects.create(owner=self.user, client=client, title='Web', status='won', value_estimate=4000)
+        l2 = Lead.objects.create(owner=self.user, client=client, title='Care', status='won', value_estimate=2000)
+        res = self.client.post(
+            '/api/invoices/',
+            {
+                'number': 'INV-MULTI', 'client': client.pk, 'amount': '6000',
+                'status': 'sent', 'leads': [l1.pk, l2.pk],
+            },
+            format='json',
+        )
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        inv = Invoice.objects.get(number='INV-MULTI')
+        self.assertEqual(set(inv.leads.values_list('pk', flat=True)), {l1.pk, l2.pk})
+        res = self.client.get(f'/api/invoices/{inv.pk}/')
+        self.assertEqual(len(res.data['deal_lines']), 2)
+
+    def test_invoice_rejects_foreign_deal(self):
+        from crm.models import Client, Lead
+
+        other = User.objects.create_user(username='stranger', password='pw123456')
+        foreign = Lead.objects.create(owner=other, title='Theirs', status='won')
+        client = Client.objects.create(owner=self.user, name='Acme')
+        res = self.client.post(
+            '/api/invoices/',
+            {
+                'number': 'INV-X', 'client': client.pk, 'amount': '100',
+                'leads': [foreign.pk],
+            },
+            format='json',
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invoice_number_auto_generated(self):
+        from crm.models import Client
+
+        client = Client.objects.create(owner=self.user, name='Acme')
+        res = self.client.post(
+            '/api/invoices/',
+            {'client': client.pk, 'amount': '2500', 'status': 'draft'},
+            format='json',
+        )
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        inv = Invoice.objects.get(pk=res.data['id'])
+        today = date.today()
+        self.assertEqual(inv.number, f'INV-{today:%Y/%m/%d}-{inv.id}')
+        self.assertEqual(res.data['number'], inv.number)
+
+    def test_invoice_discount_bounds(self):
+        from crm.models import Client
+
+        client = Client.objects.create(owner=self.user, name='Acme')
+        res = self.client.post(
+            '/api/invoices/',
+            {'client': client.pk, 'amount': '1000', 'discount_percent': 150},
+            format='json',
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        res = self.client.post(
+            '/api/invoices/',
+            {'client': client.pk, 'amount': '1000', 'discount_percent': 10},
+            format='json',
+        )
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(res.data['discount_percent'], 10)
+
+    def test_invoice_amount_must_be_positive(self):
+        from crm.models import Client
+
+        client = Client.objects.create(owner=self.user, name='Acme')
+        res = self.client.post(
+            '/api/invoices/',
+            {'client': client.pk, 'amount': '0'},
+            format='json',
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invoice_custom_items_roundtrip(self):
+        from crm.models import Client
+
+        client = Client.objects.create(owner=self.user, name='Acme')
+        res = self.client.post(
+            '/api/invoices/',
+            {
+                'client': client.pk, 'amount': '7000',
+                'items': [
+                    {'description': 'Extra revision', 'amount': '5000'},
+                    {'description': 'Domain fee', 'amount': '2000'},
+                ],
+            },
+            format='json',
+        )
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(len(res.data['items']), 2)
+        inv_id = res.data['id']
+        # Replace-all on update.
+        res = self.client.patch(
+            f'/api/invoices/{inv_id}/',
+            {'items': [{'description': 'Only this', 'amount': '3000'}]},
+            format='json',
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res = self.client.get(f'/api/invoices/{inv_id}/')
+        self.assertEqual(len(res.data['items']), 1)
+        self.assertEqual(res.data['items'][0]['description'], 'Only this')

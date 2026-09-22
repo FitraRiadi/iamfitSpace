@@ -1,8 +1,10 @@
+import uuid
 from datetime import date
 
 from django.db import transaction as db_transaction
 from django.db.models import Q, Sum
 from django.db.models.functions import TruncMonth
+from django.utils import timezone
 from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -13,12 +15,23 @@ from .serializers import InvoiceSerializer, TransactionSerializer
 
 
 class InvoiceViewSet(OwnerViewSet):
-    queryset = Invoice.objects.select_related('client', 'project').all()
+    queryset = Invoice.objects.select_related('client', 'project').prefetch_related('leads').all()
     serializer_class = InvoiceSerializer
     filterset_fields = ['status', 'client', 'project']
     search_fields = ['number', 'notes', 'client__name']
     ordering_fields = ['amount', 'due_date', 'created_at']
     ordering = ['-created_at']
+
+    def perform_create(self, serializer):
+        number = (serializer.validated_data.get('number') or '').strip()
+        if number:
+            serializer.save(owner=self.request.user)
+            return
+        # Auto number: needs the PK -> create with unique temp, then stamp.
+        with db_transaction.atomic():
+            instance = serializer.save(owner=self.request.user, number=f'TEMP-{uuid.uuid4().hex}')
+            instance.number = f"INV-{timezone.now():%Y/%m/%d}-{instance.id}"
+            instance.save(update_fields=['number'])
 
 
 class TransactionViewSet(OwnerViewSet):
@@ -47,7 +60,9 @@ class TransactionViewSet(OwnerViewSet):
                     project=instance.project,
                     number='TEMP',
                     amount=instance.amount,
-                    status=Invoice.Status.DRAFT,
+                    # Born PAID: the money is already in hand (direct sale),
+                    # so this invoice never passes through outstanding.
+                    status=Invoice.Status.PAID,
                     due_date=inv_due or instance.occurred_on,
                 )
                 # Number needs the PK: INV-YYYY/MM/DD-{id} (unique by id suffix).

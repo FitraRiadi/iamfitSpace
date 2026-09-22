@@ -11,8 +11,10 @@ import {
   VscSettingsGear,
 } from 'react-icons/vsc'
 import { useAuth } from '../lib/auth'
+import { TaskProvider } from '../lib/tasks'
 import { SpinnerCircle } from './ui'
 import Topbar, { SpaceControls } from './Topbar'
+import TaskStack from './TaskStack'
 import './space.css'
 
 const NAV = [
@@ -105,39 +107,8 @@ export default function SpaceShell() {
   }
 
   return (
-    <div className="space-theme min-h-screen bg-[#131313] text-[#e5e2e1] flex flex-col md:flex-row">
-      {/* Sidebar icon rail (desktop) */}
-      <aside className="hidden md:flex w-[68px] shrink-0 flex-col items-center border-r border-[#2a2a2a] bg-[#0e0e0e] min-h-screen sticky top-0 h-screen py-4 gap-1">
-        <Link
-          to="/space"
-          title="IAMFIT SPACE — OVERVIEW"
-          className="w-11 h-11 mb-4 bg-[#c0f500] text-[#161f00] flex items-center justify-center font-jersey text-xl font-bold"
-        >
-          IF
-        </Link>
-        <nav className="flex flex-col gap-1">
-          <NavItems rail />
-        </nav>
-        <div className="mt-auto flex flex-col items-center gap-1">
-          <Link
-            to="/"
-            title="Back to site"
-            aria-label="Back to site"
-            className="w-11 h-11 flex items-center justify-center text-[#a8b09a] hover:text-[#e5e2e1] hover:bg-white/[0.04] transition-colors"
-          >
-            <VscHome size={20} />
-          </Link>
-          <button
-            onClick={out}
-            title="Logout"
-            aria-label="Logout"
-            className="w-11 h-11 flex items-center justify-center text-[#a8b09a] hover:text-[#ffb4ab] hover:bg-white/[0.04] transition-colors"
-          >
-            <VscSignOut size={20} />
-          </button>
-        </div>
-      </aside>
-
+    <TaskProvider>
+    <div className="space-theme min-h-screen bg-[#131313] text-[#e5e2e1] flex flex-col">
       {/* Mobile topbar */}
       <div className="md:hidden border-b border-[#2a2a2a] bg-[#0e0e0e] sticky top-0 z-40">
         <div className="flex items-center justify-between px-4 py-2.5">
@@ -172,13 +143,45 @@ export default function SpaceShell() {
         </nav>
       </div>
 
-      {/* Content column: slim topbar + page */}
-      <div className="flex-1 min-w-0 flex flex-col">
-        <Topbar />
+      {/* Desktop topbar — full width above everything. Direct child of the
+          page column so sticky has room to work (a sticky element can only
+          stick within its parent's height). */}
+      <Topbar />
+
+      <div className="flex flex-col md:flex-row flex-1 min-h-0">
+        {/* Sidebar icon rail (desktop) — sits one layer under the topbar */}
+        <aside className="hidden md:flex w-[68px] shrink-0 flex-col items-center border-r border-[#2a2a2a] bg-[#0e0e0e] sticky top-12 h-[calc(100vh-3rem)] py-4 gap-1 self-start">
+          <nav className="flex flex-col gap-1">
+            <NavItems rail />
+          </nav>
+          <div className="mt-auto flex flex-col items-center gap-1">
+            <Link
+              to="/"
+              title="Back to site"
+              aria-label="Back to site"
+              className="w-11 h-11 flex items-center justify-center text-[#a8b09a] hover:text-[#e5e2e1] hover:bg-white/[0.04] transition-colors"
+            >
+              <VscHome size={20} />
+            </Link>
+            <button
+              onClick={out}
+              title="Logout"
+              aria-label="Logout"
+              className="w-11 h-11 flex items-center justify-center text-[#a8b09a] hover:text-[#ffb4ab] hover:bg-white/[0.04] transition-colors"
+            >
+              <VscSignOut size={20} />
+            </button>
+          </div>
+        </aside>
+
+        {/* Content */}
         <main className="flex-1 min-w-0 px-3 sm:px-5 py-5 w-full">
           <Outlet />
         </main>
       </div>
+      {/* Activity stack persists across dashboard pages (provider above). */}
+      <TaskStack />
     </div>
+    </TaskProvider>
   )
 }

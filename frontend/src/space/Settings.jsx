@@ -2,12 +2,14 @@ import { useEffect, useRef, useState } from 'react'
 import { VscEdit, VscTrash } from 'react-icons/vsc'
 import { apiGet, apiPatch } from '../lib/api'
 import { useAuth } from '../lib/auth'
+import { useTasks } from '../lib/tasks'
 import { setAvatar, clearAvatar, useAvatar } from '../lib/profile'
-import { PageHead, Btn, Field, inputCls, ErrorBox, SpinnerCircle, Toast } from './ui'
+import { PageHead, Btn, Field, TInput, ErrorBox, SpinnerCircle, Toast } from './ui'
 import AvatarCrop from './AvatarCrop'
 
 export default function Settings() {
   const { updateUser } = useAuth()
+  const { track } = useTasks()
   const [form, setForm] = useState({ first_name: '', last_name: '', username: '', email: '' })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -51,12 +53,12 @@ export default function Settings() {
     setBusy(true)
     setError('')
     try {
-      const me = await apiPatch('/api/auth/me/', {
+      const me = await track(apiPatch('/api/auth/me/', {
         first_name: form.first_name,
         last_name: form.last_name,
         username: form.username.trim(),
         email: form.email.trim(),
-      })
+      }), 'UPDATE PROFILE')
       updateUser({ username: me.username })
       showToast('PROFILE UPDATED. Changes are live.')
     } catch (err) {
@@ -141,18 +143,18 @@ export default function Settings() {
       <form onSubmit={submit} className="border border-[#2a2a2a] bg-[#1c1b1b] p-5 flex flex-col gap-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="First name">
-            <input value={form.first_name} onChange={set('first_name')} className={inputCls} placeholder="Fitra" />
+            <TInput value={form.first_name} onChange={set('first_name')} placeholder="Fitra" />
           </Field>
           <Field label="Last name">
-            <input value={form.last_name} onChange={set('last_name')} className={inputCls} placeholder="Riadi" />
+            <TInput value={form.last_name} onChange={set('last_name')} placeholder="Riadi" />
           </Field>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="Username *">
-            <input required value={form.username} onChange={set('username')} className={inputCls} />
+            <TInput required value={form.username} onChange={set('username')} />
           </Field>
           <Field label="Email">
-            <input type="email" value={form.email} onChange={set('email')} className={inputCls} />
+            <TInput type="email" value={form.email} onChange={set('email')} />
           </Field>
         </div>
         <Btn type="submit" disabled={busy}>

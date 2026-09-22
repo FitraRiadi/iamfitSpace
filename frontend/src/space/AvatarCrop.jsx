@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react'
 import Cropper from 'react-easy-crop'
 import 'react-easy-crop/react-easy-crop.css'
-import { Modal, Btn, ErrorBox } from './ui'
+import { Modal, Btn, ErrorBox, TSlider } from './ui'
 
 function loadImage(src) {
   return new Promise((resolve, reject) => {
@@ -64,18 +64,17 @@ export default function AvatarCrop({ image, onCancel, onDone }) {
             onCropComplete={onCropComplete}
           />
         </div>
-        <label className="flex items-center gap-3 font-mono text-[11px] text-[#a8b09a] uppercase">
-          Zoom
-          <input
-            type="range"
+        <div className="flex items-center gap-3 font-mono text-[11px] text-[#a8b09a] uppercase">
+          <span className="shrink-0">Zoom</span>
+          <TSlider
             min={1}
             max={3}
             step={0.05}
-            value={zoom}
-            onChange={(e) => setZoom(Number(e.target.value))}
-            className="flex-1 accent-[#c0f500]"
+            value={[zoom]}
+            onValueChange={([z]) => setZoom(z)}
+            className="flex-1"
           />
-        </label>
+        </div>
         {error && <ErrorBox message={error} />}
         <div className="flex gap-2 justify-end">
               <Btn variant="secondary" onClick={onCancel}>
